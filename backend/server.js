@@ -45,7 +45,9 @@ app.get('/api/test-supabase', async (req, res) => {
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Routes
+const authRoutes = require('./routes/auth');
 const propertyRoutes = require('./routes/properties');
+app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
 
 // Root route
