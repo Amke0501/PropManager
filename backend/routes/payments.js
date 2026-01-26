@@ -1,5 +1,5 @@
 
-
+// Admin access all data
 router.post("/", auth, requireAdmin, async (req, res) => {
   const { tenant_id, amount, month } = req.body;
 
@@ -12,6 +12,7 @@ router.post("/", auth, requireAdmin, async (req, res) => {
   res.status(201).json({ message: "Payment recorded", data });
 });
 
+// Access for tenant
 router.get("/", auth, async (req, res) => {
   const role = req.user.role;
   let query = supabase.from("payments").select("*");
