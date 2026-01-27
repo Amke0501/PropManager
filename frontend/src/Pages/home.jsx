@@ -4,7 +4,7 @@ import {Header} from "../components/Header/Header.jsx";
 
 export const Home = () => {
     return (
-        <div>
+        <div className="min-h-screen bg-gray-50">
         <Header />
         {/*<DashboardAdmin/>*/}
         </div>
