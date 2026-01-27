@@ -1,6 +1,8 @@
-const router = Router.express()
+
+const express = require("express");
+const router = express.Router();
 const supabase = require("../supabaseClient");
-const auth = require("../middleware/auth");
+const auth = require('./auth');
 
 router.post("/", auth, async (req, res) => {
   const { receiver_id, message } = req.body;
