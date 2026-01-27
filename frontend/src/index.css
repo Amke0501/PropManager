@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+
+
+
+header{
+    @apply px-5 py-3 pb-3 border-b border-b-[#e0e0e0] bg-[#FBFBFB]
+
+}
+
+.page-wrapper{
+    @apply px-17 pt-6 pb-3
+}
