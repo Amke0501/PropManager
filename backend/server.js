@@ -45,10 +45,12 @@ app.get('/api/test-supabase', async (req, res) => {
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Routes
+const messageRoutes = require('./routes/communication');
 const propertyRoutes = require('./routes/properties');
 const maintenanceRoutes = require('./routes/maintenance');
 const paymentsRoutes = require('./routes/payments');
 
+app.use('/api/communication',messageRoutes);
 app.use('/api/maintenance', maintenanceRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/properties', propertyRoutes);
