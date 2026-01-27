@@ -1,3 +1,8 @@
+const express = require("express");
+const router = express.Router();
+const supabase = require("../supabaseClient");
+const auth = require("../middleware/auth");
+const requireAdmin = require("../middleware/requireRole");
 
 // Admin access all data
 router.post("/", auth, requireAdmin, async (req, res) => {
@@ -48,3 +53,4 @@ router.get("/history/:tenantId", auth, async (req, res) => {
   res.json(data);
 });
 
+module.exports = router;
