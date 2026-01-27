@@ -9,10 +9,14 @@ export const Home = () => {
         {/*<DashboardAdmin/>*/}
 
         {/*HERO SECTION*/}
-        <section>
-            <div>
-                <h1>Prop.Manger</h1>
-                <p>We manage properties, liase with tenants and attend to all related maintenance request so that that you can focus on what matters most.</p>
+        <section className="bg-gradient-to-r from-blue-800 text-white py-20">
+            <div className="max-w-7xl mx-auto px-6 text-center">
+                <h1 className="text-5xl font-bold mb-6">
+                    Prop.Manger
+                </h1>
+                <p className="text-xl mb-8 text-blue-100">
+                    We manage properties, liase with tenants and attend to all related maintenance request so that that you can focus on what matters most.
+                </p>
             </div>
         </section>
 
