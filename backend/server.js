@@ -4,7 +4,7 @@ const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
-/*
+
 // Supabase client setup
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -54,7 +54,7 @@ const paymentsRoutes = require('./routes/payments');
 app.use('/api/communication',messageRoutes);
 app.use('/api/maintenance', maintenanceRoutes);
 app.use('/api/payments', paymentsRoutes);
-app.use('/api/properties', propertyRoutes);*/
+app.use('/api/properties', propertyRoutes);
 
 // Root route
 app.get('/api', (req, res) => {
