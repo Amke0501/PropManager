@@ -6,6 +6,7 @@ import {NotFound} from "./Pages/notFound.jsx";
 function App() {
   return (
     <>
+   
        <BrowserRouter>
            <Routes>
                <Route index element={<Home />} />
