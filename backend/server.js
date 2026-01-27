@@ -49,8 +49,8 @@ const propertyRoutes = require('./routes/properties');
 const maintenanceRoutes = require('./routes/maintenance');
 const paymentsRoutes = require('./routes/payments');
 
-app.use('./api/maintenance', maintenanceRoutes);
-app.use('./api/payments', paymentsRoutes);
+app.use('/api/maintenance', maintenanceRoutes);
+app.use('/api/payments', paymentsRoutes);
 app.use('/api/properties', propertyRoutes);
 
 // Root route
