@@ -51,7 +51,7 @@ export const Home = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
                     {/*FEATURE 1*/}
-                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                    <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition">
                         <div className="text-5xl mb-4">🏢</div> {/*used windows key and . to get emoji*/}
                         <h3 className="text-xl font-bold mb-2 text-gray-800">
                             Properties
@@ -62,7 +62,7 @@ export const Home = () => {
                     </div>
 
                     {/*FEATURE 2*/}
-                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                    <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition">
                         <div className="text-5xl mb-4">👥</div> {/*used windows key and . to get emoji*/}
                         <h3 className="text-xl font-bold mb-2 text-gray-800">
                             Tenants
@@ -73,7 +73,7 @@ export const Home = () => {
                     </div>
 
                     {/*FEATURE 3*/}
-                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                    <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition">
                         <div className="text-5xl mb-4">💸</div> {/*used windows key and . to get emoji*/}
                         <h3 className="text-xl font-bold mb-2 text-gray-800">
                             Rent Payments
@@ -84,7 +84,7 @@ export const Home = () => {
                     </div>
 
                     {/*FEATURE 4*/}
-                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                    <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition">
                         <div className="text-5xl mb-4">⛏️</div> {/*used windows key and . to get emoji*/}
                         <h3 className="text-xl font-bold mb-2 text-gray-800">
                             Maintenance
