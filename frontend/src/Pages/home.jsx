@@ -96,13 +96,19 @@ export const Home = () => {
 
                 </div>
 
+            </div>
+        </section>
 
-
-
-
-
-
-
+        {/*CALL TO ACTION SECTION*/}
+        <section className="bg-blue-600 text-hitr py-16 px-6">
+            <div className="max-w-4xl mx-autto text-center">
+                <h2 className="text-3xl font-bold mb-4">
+                 Ready to simplify your property management and maximize on your returns?
+                </h2>
+                <p className="text-xl mb-8 text-blue-100">
+                    Get started with Join Prop.Manager and get started today!
+                </p>
+                
             </div>
         </section>
 
