@@ -16,14 +16,6 @@ export const UpcomingActivity = () => {
     },
     {
       id: 2,
-      date: new Date(2026, 0, 28),
-      title: "Lease Signing",
-      property: "456 Oak Ave",
-      type: "lease",
-      time: "2:00 PM",
-    },
-    {
-      id: 3,
       date: new Date(2026, 0, 30),
       title: "Maintenance Check",
       property: "789 Pine Rd",
@@ -31,7 +23,7 @@ export const UpcomingActivity = () => {
       time: "9:00 AM",
     },
     {
-      id: 4,
+      id: 3,
       date: new Date(2026, 1, 2),
       title: "Tenant Meeting",
       property: "321 Elm St",
@@ -39,7 +31,7 @@ export const UpcomingActivity = () => {
       time: "3:00 PM",
     },
     {
-      id: 5,
+      id: 4,
       date: new Date(2026, 1, 5),
       title: "Rent Collection",
       property: "654 Maple Dr",
@@ -130,8 +122,8 @@ export const UpcomingActivity = () => {
   };
 
   return (
-    <div className="mt-6">
-      <div className="w-[740px] h-[480px] border-2 transition-all duration-200 hover:shadow-lg border-gray-200 bg-white rounded-2xl px-4 py-1 flex gap-4">
+    <div className="mt-16">
+      <div className="w-[740px] h-[305px] border-2 transition-all duration-200 hover:shadow-lg border-gray-200 bg-white rounded-2xl px-4 py-1 flex gap-4">
         {/* Calendar Section */}
         <div className="flex-1 flex flex-col">
           {/* Calendar Header */}

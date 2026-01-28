@@ -17,7 +17,7 @@ export const Header = () => {
                     </div>
                     <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-200 p-2 rounded-2xl">
                         <MessageCircle/>
-                        <div className="font-medium">Profile</div>
+                        <div className="font-medium">Messages</div>
                     </div>
                 </nav>
             </header>
