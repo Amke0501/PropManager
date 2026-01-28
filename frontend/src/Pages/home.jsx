@@ -17,6 +17,21 @@ export const Home = () => {
                 <p className="text-xl mb-8 text-blue-100">
                     We manage properties, liase with tenants and attend to all related maintenance request so that that you can focus on what matters most.
                 </p>
+
+                {/*BUTTONS*/}
+                <div className="flex gap-4 justify-center">
+
+                  {/*SIGN UP BUTTON*/}  
+                  <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold">
+                    Sign Up
+                  </button>
+
+                  {/*LOGIN BUTTON*/}  
+                  <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold">
+                    Login
+                  </button>
+
+                </div>
             </div>
         </section>
 
