@@ -22,12 +22,12 @@ export const Home = () => {
                 <div className="flex gap-4 justify-center">
 
                   {/*SIGN UP BUTTON*/}  
-                  <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold">
+                  <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
                     Sign Up
                   </button>
 
                   {/*LOGIN BUTTON*/}  
-                  <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold">
+                  <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
                     Login
                   </button>
 
