@@ -1,20 +1,21 @@
-import {House} from "lucide-react";
+import {FileExclamationPoint, House, MessageCircle} from "lucide-react";
 
 
 export const Summary = () => {
 
     const blocks = [
         {
-            heading: "Properties occupied",
-            icon: <House />
+            heading: "0 Properties occupied",
+            icon: <House />,
         },
         {
             heading: "Messages",
-            icon: <House />
+            icon: <MessageCircle />,
         },
         {
             heading: "Requests and Complaints",
-            icon: <House />
+            icon: <FileExclamationPoint />,
+            description: "",
         },
     ]
 
@@ -23,8 +24,15 @@ export const Summary = () => {
             <div className="flex justify-between">
                 {blocks.map((block, index) => (
                     <div key={index}>
-                        <div className="w-xs h-20 bg-white ">
-                            {block.heading}
+                        <div className="w-[363px] h-16 bg-white rounded-lg pt-4 pl-4  shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] border-2 border-[#e0e0e0] ">
+                            <div className="flex gap-3 items-center">
+                                {block.icon}
+                                <div>
+                                    {block.heading}
+                                </div>
+
+                            </div>
+
                         </div>
                     </div>
                 ))}

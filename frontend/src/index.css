@@ -4,7 +4,7 @@
 
 
 header{
-    @apply px-5 py-3 pb-3 border-b border-b-[#e0e0e0] bg-[#FBFBFB]
+    @apply px-5 py-3 pb-3 border-b-4 border-b-[#e0e0e0] bg-[#FBFBFB]
 
 }
 
