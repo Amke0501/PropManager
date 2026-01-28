@@ -61,6 +61,39 @@ export const Home = () => {
                         </p>
                     </div>
 
+                    {/*FEATURE 2*/}
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <div className="text-5xl mb-4">👥</div> {/*used windows key and . to get emoji*/}
+                        <h3 className="text-xl font-bold mb-2 text-gray-800">
+                            Tenants
+                        </h3>
+                        <p className="text-gray-600">
+                            We verify and manage your tenants to ensure a smooth rental experience.
+                        </p>
+                    </div>
+
+                    {/*FEATURE 3*/}
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <div className="text-5xl mb-4">💸</div> {/*used windows key and . to get emoji*/}
+                        <h3 className="text-xl font-bold mb-2 text-gray-800">
+                            Rent Payments
+                        </h3>
+                        <p className="text-gray-600">
+                            We ensure timely rent collection and provide detailed financial reports.
+                        </p>
+                    </div>
+
+                    {/*FEATURE 4*/}
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <div className="text-5xl mb-4">⛏️</div> {/*used windows key and . to get emoji*/}
+                        <h3 className="text-xl font-bold mb-2 text-gray-800">
+                            Maintenance
+                        </h3>
+                        <p className="text-gray-600">
+                            We maintain your properties report and keep record of all maintenance activities.
+                        </p>
+                    </div>
+
                 </div>
 
 
