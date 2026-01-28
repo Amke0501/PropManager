@@ -100,8 +100,8 @@ export const Home = () => {
         </section>
 
         {/*CALL TO ACTION SECTION*/}
-        <section className="bg-blue-600 text-hitr py-16 px-6">
-            <div className="max-w-4xl mx-autto text-center">
+        <section className="bg-blue-600 text-white py-16 px-6">
+            <div className="max-w-4xl mx-auto text-center">
                 <h2 className="text-3xl font-bold mb-4">
                  Ready to simplify your property management and maximize on your returns?
                 </h2>
@@ -112,6 +112,15 @@ export const Home = () => {
             </div>
         </section>
 
+        {/*FOOTER SECTION*/}
+        <footer className="bg-gray-800 text-white py-8 px-6">
+            <div className="max-w-7xl mx-autto text-center">
+                <p className="text-gray-400">
+                    Prop.Manager. Built for property management 
+                </p>
+                
+            </div>
+        </footer>
 
 
         </div>
