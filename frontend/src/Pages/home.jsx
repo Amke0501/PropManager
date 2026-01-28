@@ -35,6 +35,46 @@ export const Home = () => {
             </div>
         </section>
 
+        {/*FUNCTIONS/FEATURES SECTION*/}
+        <section className="py-20 px-6">
+            <div className="max-w-7xl mx-auto">
+
+                {/*FUNCTIONS/FEATURES */}
+                <h2 className="text-4xl font-bold text-center mb-4 text-gray-800">
+                    All things property related 
+                </h2>
+                <p className="text-center text-gray-600 mb-12">
+                    Our services are built to assist with property management from start to finish.
+                </p>
+
+                {/*FUNCTIONS/FEATURES GRID*/}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+                    {/*FEATURE 1*/}
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <div className="text-5xl mb-4">🏢</div> {/*used windows key and . to get emoji*/}
+                        <h3 className="text-xl font-bold mb-2 text-gray-800">
+                            Properties
+                        </h3>
+                        <p className="text-gray-600">
+                            We manage all your properties in one place, making it easy
+                        </p>
+                    </div>
+
+                </div>
+
+
+
+
+
+
+
+
+            </div>
+        </section>
+
+
+
         </div>
     )
 }
