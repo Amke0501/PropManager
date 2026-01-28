@@ -1,36 +1,22 @@
-const jwt = require("jsonwebtoken");
+const supabase = require("../supabaseClient");
 
-const requireAuth = (req, res, next) => {
+module.exports = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  // Check if Authorization header exists
   if (!authHeader) {
     return res.status(401).json({ error: "Not authenticated" });
   }
 
-  //  Bearer TOKEN
   const token = authHeader.split(" ")[1];
 
-  if (!token) {
-    return res.status(401).json({ error: "Not authenticated" });
-  }
+  const { data, error } = await supabase.auth.getUser(token);
 
-  try {
-    //Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Attach user info to request
-    req.user = {
-      id: decoded.id,
-      role: decoded.role,
-      email: decoded.email
-    };
-
-    next();
-  } catch (err) {
+  if (error || !data.user) {
     return res.status(401).json({ error: "Invalid token" });
   }
+
+  req.user = data.user; // ✅ Supabase user
+  next();
 };
 
-module.exports = requireAuth;
 
