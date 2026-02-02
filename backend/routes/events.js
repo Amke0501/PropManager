@@ -7,10 +7,18 @@ const requireAdmin = require('../middleware/requireRole');
 // Get all events
 router.get('/', auth, async (req, res) => {
     try {
-        const { data, error } = await supabase
+        let query = supabase
             .from('events')
             .select('*')
             .order('date', { ascending: true });
+
+        // If user is a tenant, only show their events
+        const userRole = req.user.user_metadata?.role || req.user.role || 'tenant';
+        if (userRole === 'tenant') {
+            query = query.eq('user_id', req.user.id);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
         res.json(data);
@@ -19,14 +27,26 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
-// Create event (Admin only)
-router.post('/', auth, requireAdmin, async (req, res) => {
+// Create event (Both users and admins can create)
+router.post('/', auth, async (req, res) => {
     try {
-        const { title, property, type, date, time } = req.body;
+        const { title, property, type, date, time, description } = req.body;
+        const userRole = req.user.user_metadata?.role || req.user.role || 'tenant';
+
+        const eventData = {
+            title,
+            property,
+            type,
+            date,
+            time,
+            description: description || '',
+            user_id: req.user.id,
+            created_by: userRole
+        };
 
         const { data, error } = await supabase
             .from('events')
-            .insert([{ title, property, type, date, time }])
+            .insert([eventData])
             .select();
 
         if (error) throw error;
@@ -36,14 +56,14 @@ router.post('/', auth, requireAdmin, async (req, res) => {
     }
 });
 
-// Update event (Admin only)
+// Update event
 router.put('/:id', auth, requireAdmin, async (req, res) => {
     try {
-        const { title, property, type, date, time } = req.body;
+        const { title, property, type, date, time, description } = req.body;
 
         const { data, error } = await supabase
             .from('events')
-            .update({ title, property, type, date, time })
+            .update({ title, property, type, date, time, description })
             .eq('id', req.params.id)
             .select();
 
@@ -54,7 +74,7 @@ router.put('/:id', auth, requireAdmin, async (req, res) => {
     }
 });
 
-// Delete event (Admin only)
+// Delete event
 router.delete('/:id', auth, requireAdmin, async (req, res) => {
     try {
         const { error } = await supabase

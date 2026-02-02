@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { maintenanceAPI } from '../../../services/api';
+import { maintenanceAPI, eventsAPI } from '../../../services/api';
 
 export const Options = () => {
     const [showModal, setShowModal] = useState(false);
@@ -8,18 +8,24 @@ export const Options = () => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        property_id: ''
+        property: '',
+        date: '',
+        time: '09:00',
+        type: 'meeting'
     });
 
     const handleOptionClick = (type) => {
         setModalType(type);
         setShowModal(true);
 
-        // Reset form
+        // Reset form with appropriate defaults
         setFormData({
             title: '',
             description: '',
-            property_id: ''
+            property: '',
+            date: new Date().toISOString().split('T')[0],
+            time: '09:00',
+            type: type === 'notice' ? 'meeting' : type === 'maintenance' ? 'maintenance' : 'meeting'
         });
     };
 
@@ -27,16 +33,39 @@ export const Options = () => {
         e.preventDefault();
 
         try {
-            switch (modalType) {
+            switch(modalType) {
                 case 'notice':
-                    // Handle notice submission
-                    console.log('Submitting notice:', formData);
-                    alert('Notice submitted successfully!');
+                    // Submit notice as calendar event
+                    await eventsAPI.create({
+                        title: formData.title,
+                        property: formData.property,
+                        type: 'meeting',
+                        date: formData.date,
+                        time: formData.time,
+                        description: formData.description
+                    });
+                    alert('Notice submitted successfully! It has been added to the calendar.');
                     break;
 
                 case 'maintenance':
-                    await maintenanceAPI.create(formData);
-                    alert('Maintenance request submitted successfully!');
+                    // Submit maintenance request (both to maintenance table and calendar)
+                    await maintenanceAPI.create({
+                        title: formData.title,
+                        description: formData.description,
+                        property_id: formData.property
+                    });
+
+                    // Also add to calendar
+                    await eventsAPI.create({
+                        title: `Maintenance: ${formData.title}`,
+                        property: formData.property,
+                        type: 'maintenance',
+                        date: formData.date,
+                        time: formData.time,
+                        description: formData.description
+                    });
+
+                    alert('Maintenance request submitted successfully! It has been added to the calendar.');
                     break;
 
                 case 'payment':
@@ -57,7 +86,7 @@ export const Options = () => {
             setShowModal(false);
         } catch (error) {
             console.error('Error:', error);
-            alert('Failed to submit request');
+            alert('Failed to submit request. Please try again.');
         }
     };
 
@@ -86,127 +115,227 @@ export const Options = () => {
     ];
 
     const renderModalContent = () => {
-        switch (modalType) {
+        switch(modalType) {
             case 'notice':
                 return (
-                    <>
-                        <h3 className="text-xl font-bold mb-4">Submit Notice</h3>
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">
-                                    Notice Type
-                                </label>
-                                <select
-                                    value={formData.title}
-                                    onChange={(e) => setFormData({...formData, title: e.target.value})}
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
-                                    required
-                                >
-                                    <option value="">Select type...</option>
-                                    <option value="Move Out Notice">Move Out Notice</option>
-                                    <option value="Complaint">Complaint</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">
-                                    Details
-                                </label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                                    className="w-full border border-gray-300 rounded px-3 py-2 h-32"
-                                    required
-                                />
-                            </div>
-                            <div className="flex gap-2">
-                                <button
-                                    type="button"
-                                    onClick={handleCloseModal}
-                                    className="flex-1 bg-gray-200 px-4 py-2 rounded"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded"
-                                >
-                                    Submit
-                                </button>
-                            </div>
-                        </form>
-                    </>
+                    <form onSubmit={handleSubmit} className="w-full">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold">Submit Notice</h3>
+                            <button
+                                type="button"
+                                onClick={handleCloseModal}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-1">
+                                Notice Type
+                            </label>
+                            <select
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                required
+                            >
+                                <option value="">Select type...</option>
+                                <option value="Move Out Notice">Move Out Notice</option>
+                                <option value="Inspection Request">Inspection Request</option>
+                                <option value="Meeting Request">Meeting Request</option>
+                                <option value="Complaint">Complaint</option>
+                                <option value="Other Notice">Other Notice</option>
+                            </select>
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-1">
+                                Property/Unit
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.property}
+                                onChange={(e) => setFormData({ ...formData, property: e.target.value })}
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                placeholder="Your unit number"
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-1">
+                                Preferred Date
+                            </label>
+                            <input
+                                type="date"
+                                value={formData.date}
+                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-1">
+                                Preferred Time
+                            </label>
+                            <input
+                                type="time"
+                                value={formData.time}
+                                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-1">
+                                Details
+                            </label>
+                            <textarea
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                className="w-full border border-gray-300 rounded px-3 py-2 h-32"
+                                placeholder="Provide details about your notice..."
+                                required
+                            />
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={handleCloseModal}
+                                className="flex-1 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                            >
+                                Submit Notice
+                            </button>
+                        </div>
+                    </form>
                 );
 
             case 'maintenance':
                 return (
-                    <>
-                        <h3 className="text-xl font-bold mb-4">Maintenance Request</h3>
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">
-                                    Issue Title
-                                </label>
-                                <input
-                                    type="text"
-                                    value={formData.title}
-                                    onChange={(e) => setFormData({...formData, title: e.target.value})}
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
-                                    placeholder="e.g., Leaking Faucet"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">
-                                    Description
-                                </label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                                    className="w-full border border-gray-300 rounded px-3 py-2 h-32"
-                                    placeholder="Describe the issue in detail..."
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">
-                                    Property/Unit
-                                </label>
-                                <input
-                                    type="text"
-                                    value={formData.property_id}
-                                    onChange={(e) => setFormData({...formData, property_id: e.target.value})}
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
-                                    placeholder="Your unit number"
-                                    required
-                                />
-                            </div>
-                            <div className="flex gap-2">
-                                <button
-                                    type="button"
-                                    onClick={handleCloseModal}
-                                    className="flex-1 bg-gray-200 px-4 py-2 rounded"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded"
-                                >
-                                    Submit Request
-                                </button>
-                            </div>
-                        </form>
-                    </>
+                    <form onSubmit={handleSubmit} className="w-full">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold">Maintenance Request</h3>
+                            <button
+                                type="button"
+                                onClick={handleCloseModal}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-1">
+                                Issue Title
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                placeholder="e.g., Leaking Faucet"
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-1">
+                                Property/Unit
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.property}
+                                onChange={(e) => setFormData({ ...formData, property: e.target.value })}
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                placeholder="Your unit number"
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-1">
+                                Preferred Date for Service
+                            </label>
+                            <input
+                                type="date"
+                                value={formData.date}
+                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-1">
+                                Preferred Time
+                            </label>
+                            <input
+                                type="time"
+                                value={formData.time}
+                                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-1">
+                                Description
+                            </label>
+                            <textarea
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                className="w-full border border-gray-300 rounded px-3 py-2 h-32"
+                                placeholder="Describe the issue in detail..."
+                                required
+                            />
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={handleCloseModal}
+                                className="flex-1 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                            >
+                                Submit Request
+                            </button>
+                        </div>
+                    </form>
                 );
 
             case 'payment':
                 return (
-                    <div>
-                        <h3 className="text-xl font-bold mb-4">Make a Payment</h3>
+                    <div className="w-full">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold">Make a Payment</h3>
+                            <button
+                                type="button"
+                                onClick={handleCloseModal}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
                         <div className="mb-4">
                             <p className="text-sm text-gray-600 mb-4">
-                                Current Balance: <span className="font-bold text-lg">R0,00</span>
+                                Current Balance: <span className="font-bold text-lg">R5,500</span>
                             </p>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium mb-1">
@@ -232,7 +361,7 @@ export const Options = () => {
                         <div className="flex gap-2">
                             <button
                                 onClick={handleCloseModal}
-                                className="flex-1 bg-gray-200 px-4 py-2 rounded"
+                                className="flex-1 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition-colors"
                             >
                                 Cancel
                             </button>
@@ -241,7 +370,7 @@ export const Options = () => {
                                     alert('Payment processed!');
                                     handleCloseModal();
                                 }}
-                                className="flex-1 bg-green-600 text-white px-4 py-2 rounded"
+                                className="flex-1 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
                             >
                                 Pay Now
                             </button>
@@ -251,12 +380,22 @@ export const Options = () => {
 
             case 'balance':
                 return (
-                    <div>
-                        <h3 className="text-xl font-bold mb-4">Outstanding Balance</h3>
+                    <div className="w-full">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold">Outstanding Balance</h3>
+                            <button
+                                type="button"
+                                onClick={handleCloseModal}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
                         <div className="space-y-3">
                             <div className="flex justify-between py-2 border-b">
                                 <span>Current Rent:</span>
-                                <span className="font-semibold">R0</span>
+                                <span className="font-semibold">R5,000</span>
                             </div>
                             <div className="flex justify-between py-2 border-b">
                                 <span>Late Fees:</span>
@@ -268,12 +407,12 @@ export const Options = () => {
                             </div>
                             <div className="flex justify-between py-2 text-lg font-bold">
                                 <span>Total Due:</span>
-                                <span className="text-red-600">R0</span>
+                                <span className="text-red-600">R5,500</span>
                             </div>
                         </div>
                         <button
                             onClick={handleCloseModal}
-                            className="w-full bg-blue-600 text-white px-4 py-2 rounded mt-4"
+                            className="w-full bg-blue-600 text-white px-4 py-2 rounded mt-4 hover:bg-blue-700 transition-colors"
                         >
                             Close
                         </button>
@@ -300,16 +439,15 @@ export const Options = () => {
                     </div>
                 ))}
             </div>
+
             {/* Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                        <div className="flex justify-between items-center mb-4">
-                            {renderModalContent()}
-                        </div>
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        {renderModalContent()}
                     </div>
                 </div>
             )}
         </div>
-    )
-}
+    );
+};
