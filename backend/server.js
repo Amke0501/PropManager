@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
-
+const eventRoutes = require('./routes/events');
 
 // Supabase client setup
 const supabase = createClient(
@@ -57,6 +57,7 @@ app.use('/api/communication',messageRoutes);
 app.use('/api/maintenance', maintenanceRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/properties', propertyRoutes);
+app.use('/api/events', eventRoutes);
 
 // Root route
 app.get('/api', (req, res) => {
