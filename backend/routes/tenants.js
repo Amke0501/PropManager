@@ -3,25 +3,46 @@ const router = express.Router();
 const supabase = require('../supabaseClient');
 const requireAuth = require('../middleware/auth');
 const rbac = require('../middleware/rbac');
+const { validateEmail, validateRequiredFields, sanitizeString } = require('../utils/validation');
 
 // GET /api/tenants - Get all tenants (admin only)
 router.get('/', requireAuth, rbac('admin'), async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { search, sortBy = 'created_at', order = 'desc' } = req.query;
+
+    let query = supabase
       .from('users')
       .select('*')
-      .eq('role', 'tenant')
-      .order('created_at', { ascending: false });
+      .eq('role', 'tenant');
+
+    // Apply search filter
+    if (search) {
+      const sanitizedSearch = sanitizeString(search);
+      // Note: Supabase doesn't support full-text search easily, so we'll filter in memory
+      query = query.or(`first_name.ilike.%${sanitizedSearch}%,last_name.ilike.%${sanitizedSearch}%,email.ilike.%${sanitizedSearch}%`);
+    }
+
+    // Apply sorting
+    const validSortFields = ['first_name', 'last_name', 'email', 'created_at'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
+    const isAscending = order.toLowerCase() === 'asc';
+
+    query = query.order(sortField, { ascending: isAscending });
+
+    const { data, error } = await query;
 
     if (error) throw error;
 
     res.json({
       success: true,
+      count: data.length,
       data
     });
   } catch (error) {
+    console.error('Get tenants error:', error);
     res.status(500).json({ 
-      success: false, 
+      success: false,
+      message: 'Error fetching tenants',
       error: error.message 
     });
   }
@@ -73,18 +94,35 @@ router.post('/', requireAuth, rbac('admin'), async (req, res) => {
     const { email, firstName, lastName, property_id } = req.body;
 
     // Validate required fields
-    if (!email || !firstName || !lastName) {
+    const validation = validateRequiredFields({ email, firstName, lastName }, 
+      ['email', 'firstName', 'lastName']);
+    
+    if (!validation.isValid) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Email, firstName, and lastName are required' 
+        message: 'Validation failed',
+        errors: validation.errors
       });
     }
+
+    // Validate email format
+    if (!validateEmail(email)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid email format'
+      });
+    }
+
+    // Sanitize inputs
+    const sanitizedEmail = sanitizeString(email.toLowerCase());
+    const sanitizedFirstName = sanitizeString(firstName);
+    const sanitizedLastName = sanitizeString(lastName);
 
     // First, create user in Supabase Auth with a temporary password
     const temporaryPassword = Math.random().toString(36).slice(-12);
     
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
+      email: sanitizedEmail,
       password: temporaryPassword
     });
 
@@ -95,9 +133,9 @@ router.post('/', requireAuth, rbac('admin'), async (req, res) => {
       .from('users')
       .insert([{
         id: authData.user.id,
-        email,
-        first_name: firstName,
-        last_name: lastName,
+        email: sanitizedEmail,
+        first_name: sanitizedFirstName,
+        last_name: sanitizedLastName,
         role: 'tenant'
       }])
       .select()
@@ -107,10 +145,11 @@ router.post('/', requireAuth, rbac('admin'), async (req, res) => {
 
     // Assign property if provided
     if (property_id) {
+      const propertyId = sanitizeString(property_id);
       const { error: propError } = await supabase
         .from('properties')
         .update({ tenant_id: authData.user.id })
-        .eq('id', property_id);
+        .eq('id', propertyId);
 
       if (propError) throw propError;
     }
@@ -121,8 +160,10 @@ router.post('/', requireAuth, rbac('admin'), async (req, res) => {
       data: newTenant
     });
   } catch (error) {
+    console.error('Create tenant error:', error);
     res.status(500).json({ 
-      success: false, 
+      success: false,
+      message: 'Error creating tenant',
       error: error.message 
     });
   }
