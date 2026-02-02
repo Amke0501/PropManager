@@ -2,7 +2,7 @@ import {Header} from "../components/Header/Header.jsx";
 //import {DashboardAdmin} from "../components/dashboard-admin/dashboard-admin.jsx";
 // should DashboardAdmin be in the landing page?
 
-export const Home = () => {
+export const Adminhome = () => {
     return (
         <div className="min-h-screen bg-gray-50">  {/*Haven't decided on the colour scheme yet*/}
         <Header />

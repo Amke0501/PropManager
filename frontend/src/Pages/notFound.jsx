@@ -3,6 +3,6 @@
 
 export const NotFound = () => {
     return (
-        <div>Home</div>
+        <div>Page is not available</div>
     )
 }

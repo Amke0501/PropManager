@@ -9,8 +9,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC", 
+  "license": "ISC",
   "dependencies": {
+    "jsonwebtoken": "^9.0.3",
     "nodemon": "^3.1.11"
   }
 }
