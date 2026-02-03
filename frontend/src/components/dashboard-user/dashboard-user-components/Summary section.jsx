@@ -1,19 +1,19 @@
-import {FileExclamationPoint, House, MessageCircle} from "lucide-react";
+import {BanknoteArrowDownIcon, FileExclamationPoint, House, MessageCircle} from "lucide-react";
 
 
 export const Summary = () => {
 
     const blocks = [
         {
-            heading: "0 Properties occupied",
-            icon: <House />,
+            heading: "Payment Due date",
+            icon: <BanknoteArrowDownIcon />,
         },
         {
             heading: "Messages",
             icon: <MessageCircle />,
         },
         {
-            heading: "Requests and Complaints",
+            heading: "Alerts",
             icon: <FileExclamationPoint />,
             description: "",
         },

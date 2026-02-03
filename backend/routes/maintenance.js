@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const supabase = require("../supabaseClient");
 const auth = require("../middleware/auth");
-const requireAdmin = require("../middleware/rbac");
+const requireAdmin = require("../middleware/requireRole");
 
 
 //Creates a maintenance request
@@ -65,7 +65,8 @@ router.get("/", auth, async (req, res) => {
   res.json({ message: "Status updated", data });
 });
 
-  
+  module.exports = router;
+
 
 
 

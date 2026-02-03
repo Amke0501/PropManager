@@ -1,3 +1,8 @@
+const express = require("express");
+const router = express.Router();
+const supabase = require("../supabaseClient");
+const auth = require("../middleware/auth");
+const requireAdmin = require("../middleware/requireRole");
 
 // Admin access all data
 router.post("/", auth, requireAdmin, async (req, res) => {
@@ -28,3 +33,24 @@ router.get("/", auth, async (req, res) => {
   res.json(data);
 });
 
+
+router.get("/history/:tenantId", auth, async (req, res) => {
+  const { tenantId } = req.params;
+
+  // Tenant can ONLY view their own history
+  if (req.user.role === "tenant" && req.user.id !== tenantId) {
+    return res.status(403).json({ error: "Access denied" });
+  }
+
+  const { data, error } = await supabase
+    .from("payments")
+    .select("*")
+    .eq("tenant_id", tenantId)
+    .order("created_at", { ascending: false });
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.json(data);
+});
+
+module.exports = router;
