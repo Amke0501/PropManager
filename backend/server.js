@@ -46,15 +46,21 @@ app.get('/api/test-supabase', async (req, res) => {
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Routes
+const authRoutes = require('./routes/auth');
 const messageRoutes = require('./routes/communication');
 const propertyRoutes = require('./routes/properties');
 const maintenanceRoutes = require('./routes/maintenance');
 const paymentsRoutes = require('./routes/payments');
+const reportRoutes = require('./routes/reports');
+const tenantRoutes = require('./routes/tenants');
 
+app.use('/api/auth', authRoutes);
 app.use('/api/communication',messageRoutes);
 app.use('/api/maintenance', maintenanceRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/properties', propertyRoutes);
+app.use('/api/tenants', tenantRoutes);
+app.use('/api/reports', reportRoutes);
 app.use('/api/events', eventRoutes);
 
 // Root route
