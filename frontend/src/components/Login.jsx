@@ -1,5 +1,5 @@
-"use client"
 import { useState } from "react"
+import {Link} from "react-router-dom"
 
 export default function Login() {
    const [email, setEmail] = useState("")
@@ -25,18 +25,38 @@ export default function Login() {
     }
 
     setLoading(true)
+try {
+  // Step 1: Send email & password to backend
+  const response = await fetch('http://localhost:3000/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
 
-   
-      setTimeout(() => {
-      console.log("Login details:", {
-        email,
-        password,
-        rememberMe,
-      })
+  // Step 2: Get the response from backend
+  const data = await response.json();
 
-        setLoading(false)
-       alert("Login successful (frontend only)")
-    }, 1200)
+  // Step 3: If login worked, save the token
+  if (data.success) {
+    // Save auth token so other pages can use it
+    localStorage.setItem('authToken', data.session.access_token);
+    // Save user info (name, role, etc.)
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    setLoading(false);
+    alert('Login successful!');
+    // Redirect to dashboard
+    window.location.href = '/dashboard';
+  } else {
+    // If login failed, show error message
+    setError(data.message || 'Login failed');
+    setLoading(false);
+  }
+} catch (error) {
+  // If server is down or network error
+  setError('Unable to connect to server');
+  setLoading(false);
+}
   }
 
   return (
@@ -97,12 +117,14 @@ export default function Login() {
           </button>
         </form>
 
+      <Link to="/signup">
         <p className="text-center text-sm mt-4">
           Don’t have an account?{" "}
           <span className="text-blue-600 underline cursor-pointer">
             Sign up
           </span>
         </p>
+        </Link>
       </div>
     </div>
   )

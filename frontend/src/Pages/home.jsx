@@ -1,6 +1,7 @@
 import {Header} from "../components/Header/Header.jsx";
 //import {DashboardAdmin} from "../components/dashboard-admin/dashboard-admin.jsx";
 // should DashboardAdmin be in the landing page?
+import {Link} from "react-router-dom";
 
 export const Home = () => {
     return (
@@ -21,15 +22,18 @@ export const Home = () => {
                 {/*BUTTONS*/}
                 <div className="flex gap-4 justify-center">
 
-                  {/*SIGN UP BUTTON*/}  
+                  {/*SIGN UP BUTTON*/}
+                  <Link to="/signup">  
                   <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
                     Sign Up
                   </button>
-
-                  {/*LOGIN BUTTON*/}  
+                   </Link>
+                  {/*LOGIN BUTTON*/} 
+                  <Link to="/login">
                   <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
                     Login
                   </button>
+                  </Link>
 
                 </div>
             </div>
