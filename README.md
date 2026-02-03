@@ -1,7 +1,6 @@
 # PropManager - Property Management System
 
-A full-stack web application for managing rental properties, tenants, maintenance requests, and payments. Built by a team of software development students learning real-world development practices.
-
+A full-stack web application for managing rental properties, tenants, maintenance requests, and payments. 
 ---
 
 ## Project Overview
