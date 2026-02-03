@@ -143,11 +143,11 @@ router.get('/:id', requireAuth, async (req, res) => {
 // POST /api/properties - Create property (admin only)
 router.post('/', requireAuth, rbac('admin'), async (req, res) => {
   try {
-    const { address, bedrooms, bathrooms, rent, tenant_id } = req.body;
+    const { name, address, rent, status } = req.body;
 
     // Validate required fields
-    const validation = validateRequiredFields({ address, bedrooms, bathrooms, rent }, 
-      ['address', 'bedrooms', 'bathrooms', 'rent']);
+    const validation = validateRequiredFields({ name, address, rent, status }, 
+      ['name', 'address', 'rent', 'status']);
     
     if (!validation.isValid) {
       return res.status(400).json({ 
@@ -157,23 +157,7 @@ router.post('/', requireAuth, rbac('admin'), async (req, res) => {
       });
     }
 
-    // Validate numbers
-    const bedroomVal = validatePositiveNumber(parseInt(bedrooms), 'Bedrooms');
-    if (!bedroomVal.isValid) {
-      return res.status(400).json({ 
-        success: false, 
-        message: bedroomVal.error
-      });
-    }
-
-    const bathroomVal = validatePositiveNumber(parseInt(bathrooms), 'Bathrooms');
-    if (!bathroomVal.isValid) {
-      return res.status(400).json({ 
-        success: false, 
-        message: bathroomVal.error
-      });
-    }
-
+    // Validate rent is a positive number
     const rentVal = validatePositiveNumber(parseFloat(rent), 'Rent');
     if (!rentVal.isValid) {
       return res.status(400).json({ 
@@ -182,17 +166,27 @@ router.post('/', requireAuth, rbac('admin'), async (req, res) => {
       });
     }
 
-    // Sanitize address
+    // Validate status is either 'vacant' or 'occupied'
+    const validStatuses = ['vacant', 'occupied'];
+    if (!validStatuses.includes(status.toLowerCase())) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Status must be either "vacant" or "occupied"'
+      });
+    }
+
+    // Sanitize strings
+    const sanitizedName = sanitizeString(name);
     const sanitizedAddress = sanitizeString(address);
 
     const { data: newProperty, error } = await supabase
       .from('properties')
       .insert([{
+        name: sanitizedName,
         address: sanitizedAddress,
-        bedrooms: parseInt(bedrooms),
-        bathrooms: parseInt(bathrooms),
         rent: parseFloat(rent),
-        tenant_id: tenant_id || null
+        status: status.toLowerCase(),
+        tenant_id: null
       }])
       .select()
       .single();
@@ -217,17 +211,37 @@ router.post('/', requireAuth, rbac('admin'), async (req, res) => {
 // PUT /api/properties/:id - Update property (admin only)
 router.put('/:id', requireAuth, rbac('admin'), async (req, res) => {
   try {
-    const { address, bedrooms, bathrooms, rent, tenant_id } = req.body;
+    const { name, address, rent, status, tenant_id } = req.body;
+
+    // Build update object with only provided fields
+    const updateData = {};
+    if (name) updateData.name = sanitizeString(name);
+    if (address) updateData.address = sanitizeString(address);
+    if (rent) {
+      const rentVal = validatePositiveNumber(parseFloat(rent), 'Rent');
+      if (!rentVal.isValid) {
+        return res.status(400).json({ 
+          success: false, 
+          message: rentVal.error
+        });
+      }
+      updateData.rent = parseFloat(rent);
+    }
+    if (status) {
+      const validStatuses = ['vacant', 'occupied'];
+      if (!validStatuses.includes(status.toLowerCase())) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Status must be either "vacant" or "occupied"'
+        });
+      }
+      updateData.status = status.toLowerCase();
+    }
+    if (tenant_id !== undefined) updateData.tenant_id = tenant_id;
 
     const { data: updatedProperty, error } = await supabase
       .from('properties')
-      .update({
-        ...(address && { address }),
-        ...(bedrooms && { bedrooms }),
-        ...(bathrooms && { bathrooms }),
-        ...(rent && { rent }),
-        ...(tenant_id !== undefined && { tenant_id })
-      })
+      .update(updateData)
       .eq('id', req.params.id)
       .select()
       .single();
