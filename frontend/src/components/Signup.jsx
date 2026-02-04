@@ -8,7 +8,7 @@ function fakeRegister(email, password, role) {
   return Promise.resolve({ email, role })
 }
 
-export default function Signup() {
+export function Signup() {
   const navigate = useNavigate()
 
   const [email, setEmail] = useState("")
