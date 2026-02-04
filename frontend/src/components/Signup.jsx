@@ -37,16 +37,53 @@ export default function Signup() {
     setLoading(true)
 
     try {
-      const user = await fakeRegister(email, password, role)
+      // BACKEND API CALL: POST to /api/auth/signup
+      // This sends user data to the backend server running on port 3000
+      const response = await fetch('http://localhost:3000/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email,                              // User's email from form input
+          password,                           // User's password from form input
+          firstName: email.split('@')[0],    // Extract name from email (before @)
+          lastName: 'User',                   // Default value (backend requires non-empty)
+          role                                // "user" or "admin" from radio selection
+        })
+      });
 
-      if (user.role === "admin") {
-        navigate("/dashboard-admin")
+      // Parse the JSON response from backend
+      const data = await response.json();
+
+      // CHECK IF SIGNUP WAS SUCCESSFUL
+      if (data.success) {
+        // STEP 1: Save authentication token to localStorage (if session exists)
+        if (data.session?.access_token) {
+          localStorage.setItem('authToken', data.session.access_token);
+        }
+        
+        // STEP 2: Save user information to localStorage
+        // Includes: id, email, role - useful for UI and authorization checks
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        // STEP 3: Show success message
+        alert('Account created successfully!');
+        
+        // STEP 4: Redirect to appropriate dashboard based on user role
+        if (data.user.role === "admin") {
+          navigate("/admin")     // Admin users go to /admin route
+        } else {
+          navigate("/user")      // Regular users go to /user route
+        }
       } else {
-        navigate("/dashboard-user")
+        // If backend returns success: false, show the error message
+        setError(data.message || 'Signup failed');
       }
     } catch (e) {
-      setError("Something went wrong. Please try again.")
+      // NETWORK ERROR HANDLING
+      // This catches: server down, network issues, CORS errors, etc.
+      setError('Unable to connect to server. Make sure backend is running on port 3000');
     } finally {
+      // Always stop loading spinner, whether success or failure
       setLoading(false)
     }
   }
