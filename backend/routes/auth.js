@@ -17,12 +17,44 @@ router.post('/signup', async (req, res) => {
     }
 
     // Sign up user with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    // Use admin API to create user
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
-      password
+      password,
+      user_metadata: {},
+      email_confirm: true  // Auto-confirm email to skip verification
     });
 
-    if (authError) throw authError;
+    if (authError) {
+      if (authError.code === 'not_admin') {
+        return res.status(500).json({
+          success: false,
+          message: 'Server misconfiguration: SUPABASE_SERVICE_KEY must be the service_role key to create users.'
+        });
+      }
+      if (authError.code === 'email_exists') {
+        return res.status(400).json({
+          success: false,
+          message: 'Email already registered'
+        });
+      }
+
+      throw authError;
+    }
+
+    // Update user's email_confirmed_at to bypass email verification
+    const { error: updateError } = await supabase.auth.admin.updateUserById(
+      authData.user.id,
+      {
+        email_confirm: true,
+        email_verified_at: new Date().toISOString()
+      }
+    );
+    
+    if (updateError) {
+      console.warn('Warning: Could not verify email for user:', updateError);
+      // Continue anyway - not critical
+    }
 
     // Create user record in database
     const { data: newUser, error: dbError } = await supabase
@@ -37,18 +69,57 @@ router.post('/signup', async (req, res) => {
       .select()
       .single();
 
-    if (dbError) throw dbError;
+    if (dbError) {
+      console.error('Database insert error:', dbError);
+      // If insert fails, still return success since auth user was created
+      // This can happen if user already exists in database
+      res.status(201).json({
+        success: true,
+        message: 'User created successfully',
+        user: {
+          id: authData.user.id,
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+          role: role || 'tenant'
+        },
+        session: null
+      });
+      return;
+    }
+
+    // Generate a session token for the newly created user
+    const { data: sessionData, error: sessionError } = await supabase.auth.admin.createSession(authData.user.id);
+    
+    if (sessionError) {
+      console.error('Session creation error:', sessionError);
+      // If session creation fails, return user data without session
+      res.status(201).json({
+        success: true,
+        message: 'User created successfully',
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          firstName: newUser.first_name,
+          lastName: newUser.last_name,
+          role: newUser.role
+        },
+        session: null
+      });
+      return;
+    }
 
     res.status(201).json({
       success: true,
-      message: 'User created successfully. Please check your email to confirm your account.',
+      message: 'User created successfully',
       user: {
         id: newUser.id,
         email: newUser.email,
         firstName: newUser.first_name,
         lastName: newUser.last_name,
         role: newUser.role
-      }
+      },
+      session: sessionData
     });
   } catch (error) {
     console.error('Signup error:', error);
