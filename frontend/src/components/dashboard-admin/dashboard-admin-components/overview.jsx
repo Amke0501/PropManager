@@ -41,7 +41,7 @@ const financeoverview = [
 export const Overview = () => {
     return (
         <div className="mt-6">
-            <div className="w-[363px] aspect-video border-2 transition-all duration-200 hover:bg-[#e0e0e0] border-[#e0e0e0] bg-white rounded-2xl" >
+            <div className="overview-blocks aspect-video border-2 transition-all duration-200 hover:bg-[#e0e0e0] border-[#e0e0e0] bg-white rounded-2xl" >
                 <div className="font-medium px-4 py-2 text-xl">Activity Overview</div>
                 <div className="grid grid-cols-2 grid-flow-rows-2 content-center items-center justify-center align-middle">
                     {actoverviewstats.map((actoverviewstat, index) => (
@@ -58,7 +58,7 @@ export const Overview = () => {
             </div>
 
             <div className="mt-4">
-                <div className="w-[363px] aspect-video transition-all duration-200  hover:bg-[#e0e0e0] border-2 border-[#e0e0e0] bg-white rounded-2xl" >
+                <div className="overview-blocks aspect-video transition-all duration-200  hover:bg-[#e0e0e0] border-2 border-[#e0e0e0] bg-white rounded-2xl" >
                     <div className="font-medium px-4 py-2 text-xl flex items-center gap-2"><Banknote className="hover:stroke-emerald-600"/> <div>Finances</div></div>
                     <div className="grid grid-cols-2 grid-flow-rows-2 content-center items-center justify-center align-middle">
                         {financeoverview.map((financeoverview, index) => (

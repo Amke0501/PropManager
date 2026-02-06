@@ -6,10 +6,10 @@ import { PropertiesManager } from "./dashboard-admin-components/PropertiesManage
 
 export const DashboardAdmin = () => {
     return (
-        <div className="page-wrapper bg-[#e5e5e5] min-h-screen">
+        <div className="page-wrapper bg-[#e5e5e5] min-h-screen pb-[700px]">
             <Welcome/>
             <Summary/>
-            <div className="flex gap-6">
+            <div className="dash-user-ov-upcoming">
                 <Overview/>
                 <UpcomingActivity/>
             </div>

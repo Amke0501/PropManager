@@ -6,10 +6,10 @@ import {UpcomingActivity} from "./dashboard-user-components/upcomingActivity.jsx
 
 export const DashboardUser = () => {
     return (
-        <div className="page-wrapper bg-[#e5e5e5] h-screen">
+        <div className="page-wrapper bg-[#e5e5e5] min-h-screen">
             <Welcome/>
             <Summary/>
-            <div className="flex gap-6">
+            <div className="dash-user-op-upcoming">
                 <Options/>
                 <UpcomingActivity/>
             </div>

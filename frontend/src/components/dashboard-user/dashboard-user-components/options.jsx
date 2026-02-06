@@ -432,7 +432,7 @@ export const Options = () => {
                     <div key={index}>
                         <div
                             onClick={Opt.action}
-                            className="w-[363px] h-16 bg-white hover:bg-[#e0e0e0] hover:border-l-black cursor-pointer rounded-lg pt-4 pl-4 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] border-2 border-[#e0e0e0] transition-all duration-200"
+                            className="option-blocks bg-white hover:bg-[#e0e0e0] hover:border-l-black cursor-pointer rounded-lg pt-4 pl-4 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] border-2 border-[#e0e0e0] transition-all duration-200"
                         >
                             <div className="flex">{Opt.button}</div>
                         </div>
