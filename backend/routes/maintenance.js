@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const supabase = require("../supabaseClient");
 const auth = require("../middleware/auth");
-const requireAdmin = require("../middleware/rbac");
+const requireAdmin = require("../middleware/requireRole");
 
 
 //Creates a maintenance request
@@ -51,7 +51,7 @@ router.get("/", auth, async (req, res) => {
 });
 
   //Updates maintenace status , only admins allowed
-  router.put("/:id", auth, requireAdmin, async (req, res) => {
+  router.put("/:id", auth, requireAdmin('admin'), async (req, res) => {
   const { status } = req.body;
   const { id } = req.params;
 
@@ -65,7 +65,8 @@ router.get("/", auth, async (req, res) => {
   res.json({ message: "Status updated", data });
 });
 
-  
+  module.exports = router;
+
 
 
 

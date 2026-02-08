@@ -1,0 +1,193 @@
+@import "tailwindcss";
+
+header{
+    @apply px-5 py-3 pb-3 bg-transparent
+}
+
+.bg-img{
+    background-image: url("../home-prop2.jpg");
+    background-color: cornflowerblue;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+
+
+@media screen and (min-width: 0px) {
+    .bg-img{
+        max-height: 95vh;
+    }
+
+
+    .nav-visibility{
+        @apply hidden
+    }
+    /* w-[363px] */
+    .overview-blocks{
+        @apply w-[calc(97vw-28px)] max-h-[260px]
+    }
+
+    .summary-blocks{
+        @apply w-[calc(97vw-28px)]
+    }
+
+    .option-blocks{
+        @apply w-[calc(97vw-28px)] h-[66px]
+    }
+
+    .summary-blocks-direction{
+        @apply flex-col
+    }
+
+
+
+    .cal-overlay{
+        @apply w-[600px] border-gray-200 lg:border-l flex-col hidden pt-3;
+    }
+
+    .calender-wrap{
+        @apply w-[calc(97vw-28px)] h-80
+    }
+
+    .calender-wrap2{
+        @apply w-[calc(97vw-28px)] h-full
+    }
+
+    .dash-user-ov-upcoming{
+        @apply flex snap-start gap-3 overflow-hidden scroll-smooth overflow-x-scroll
+    }
+
+    .dash-user-op-upcoming{
+        @apply flex snap-start gap-3 overflow-hidden scroll-smooth overflow-x-scroll
+    }
+}
+
+@media screen and (min-width: 744px) {
+    .summary-blocks-direction{
+        @apply flex-row
+    }
+
+    .overview-blocks{
+        @apply w-[calc(40vw-28px)] h-[250px]
+    }
+
+    .summary-blocks{
+        @apply w-[calc(35vw-28px)]
+    }
+
+    .option-blocks{
+        @apply w-[calc(35vw-28px)] h-[68px]
+    }
+    .cal-overlay{
+        @apply w-[calc(61.5vw-28px)] border-gray-200 lg:border-l hidden pt-3;
+    }
+
+    .calender-wrap{
+        @apply w-[calc(66vw-28px)] h-80
+    }
+
+    .calender-wrap2{
+        @apply w-[calc(60vw-28px)] h-[516px]
+    }
+
+    .dash-user-ov-upcoming{
+        @apply flex snap-start gap-1 overflow-hidden scroll-smooth overflow-x-scroll
+    }
+
+    .dash-user-op-upcoming{
+        @apply flex snap-start gap-1
+    }
+}
+
+/*From here downwards is laptops and monitors, basically bigger screens */
+@media screen and (min-width: 950px) {
+    .nav-visibility{
+        @apply flex
+    }
+    .sidebar-visibility{
+        @apply hidden
+    }
+
+    .overview-blocks{
+        @apply w-[calc(35.5vw-28px)] h-[250px]
+    }
+
+    .summary-blocks{
+        @apply w-[calc(30.5vw-28px)] h-[70px]
+    }
+
+    .option-blocks{
+        @apply w-[calc(30.5vw-28px)]
+    }
+
+    .page-wrapper{
+        @apply px-10 pt-4 pb-3
+    }
+
+    .cal-overlay{
+        @apply w-[calc(20.5vw-28px)] pl-4 border-gray-200 lg:border-l flex flex-col pt-3;
+    }
+
+    .calender-wrap{
+        @apply w-[calc(58.5vw-28px)] h-80
+    }
+
+    .calender-wrap2{
+        @apply w-[calc(51.9vw-28px)] h-[517px]
+    }
+
+    .dash-user-op-upcoming{
+        @apply flex snap-start gap-6 overflow-auto
+    }
+
+    .dash-user-ov-upcoming{
+        @apply flex snap-start gap-4 overflow-auto
+    }
+
+    .show-side-event{
+        @apply flex
+    }
+}
+
+@media screen and (min-width: 1129px) {
+
+    .cal-overlay{
+        @apply w-[calc(20.5vw-28px)] pl-4 border-gray-200 lg:border-l flex flex-col pt-3;
+    }
+
+    .calender-wrap{
+        @apply w-[calc(60vw-28px)] h-80
+    }
+
+    .overview-blocks{
+        @apply w-[calc(30.5vw-28px)] h-[232px]
+    }
+
+    .dash-user-ov-upcoming{
+        @apply flex snap-start gap-6 overflow-auto
+    }
+
+    .calender-wrap2{
+        @apply  w-[calc(60vw-28px)] h-[481px]
+    }
+
+}
+
+@media screen and (min-width: 1440px) {
+    .dash-user-op-upcoming{
+        @apply flex snap-start gap-8 overflow-auto
+    }
+
+    .dash-user-ov-upcoming{
+        @apply flex snap-start gap-6
+    }
+
+    .calender-wrap{
+        @apply w-[calc(61.5vw-28px)] h-80
+    }
+
+    .calender-wrap2{
+        @apply w-[calc(59.5vw-28px)] h-[481px]
+    }
+
+}
