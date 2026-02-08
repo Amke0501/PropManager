@@ -53,10 +53,10 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6">
-      <div className="w-full max-w-md bg-white border rounded-lg p-4 sm:p-6 shadow-lg">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Login</h1>
-        <p className="text-sm text-gray-500 mb-6">Enter your email and password</p>
+    <div className="min-h-screen flex items-center justify-center bg-[#0D1B2A] px-4 sm:px-6">
+      <div className="w-full max-w-md bg-[#E1E2E1] border-2 border-[#34495E] rounded-lg p-4 sm:p-6 shadow-lg">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-[#0D1B2A]">Login</h1>
+        <p className="text-sm text-[#34495E] mb-6">Enter your email and password</p>
 
         <form onSubmit={handleSubmit}>
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
@@ -90,7 +90,7 @@ export default function Login() {
               />
               Remember me
             </label>
-            <Link to="/signup" className="text-sm text-blue-600 hover:underline">
+            <Link to="/signup" className="text-sm text-[#1B3B6F] hover:underline">
               Create account
             </Link>
           </div>
@@ -98,7 +98,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-60"
+            className="w-full bg-[#1B3B6F] text-white py-2 rounded hover:bg-[#34495E] transition disabled:opacity-60"
           >
             {loading ? "Logging in..." : "Login"}
           </button>

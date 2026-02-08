@@ -19,7 +19,7 @@ export const Welcome = () => {
     }, []);
 
     return (
-        <div className="text-[130%] gotu-bold font-medium pb-5">
+        <div className="text-[130%] gotu-bold font-medium pb-5 text-[#E1E2E1]">
             {displayed}
             <span className="animate-pulse">...</span>
         </div>

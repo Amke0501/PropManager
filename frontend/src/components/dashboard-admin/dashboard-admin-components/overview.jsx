@@ -151,7 +151,7 @@ export const Overview = () => {
 
     return (
         <div className="mt-6 w-full">
-            <div className="w-full max-w-md lg:max-w-none border-2 transition-all duration-200 hover:bg-[#e0e0e0] border-[#e0e0e0] bg-white rounded-2xl">
+            <div className="w-full max-w-md lg:max-w-none border-2 transition-all duration-200 hover:bg-[#34495E] hover:text-white border-[#34495E] bg-[#E1E2E1] rounded-2xl">
                 <div className="font-medium px-4 py-2 text-lg sm:text-xl flex items-center gap-2">
                     <span>Activity Overview</span>
                     {loading && <span className="text-xs text-gray-500">Loading...</span>}
@@ -174,7 +174,7 @@ export const Overview = () => {
             </div>
 
             <div className="mt-4">
-                <div className="w-full max-w-md lg:max-w-none transition-all duration-200 hover:bg-[#e0e0e0] border-2 border-[#e0e0e0] bg-white rounded-2xl">
+                <div className="w-full max-w-md lg:max-w-none transition-all duration-200 hover:bg-[#34495E] hover:text-white border-2 border-[#34495E] bg-[#E1E2E1] rounded-2xl">
                     <div className="font-medium px-4 py-2 text-lg sm:text-xl flex items-center gap-2">
                         <Banknote className="hover:stroke-emerald-600" />
                         <div>Finances</div>

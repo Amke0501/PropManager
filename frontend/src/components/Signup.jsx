@@ -89,10 +89,10 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow p-6">
-        <h1 className="text-2xl font-semibold mb-1">Create your account</h1>
-        <p className="text-sm text-gray-500 mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-[#E1E2E1] px-4">
+      <div className="w-full max-w-md bg-[#0D1B2A] rounded-lg shadow border-2 border-[#34495E] p-6">
+        <h1 className="text-2xl font-semibold mb-1 text-[#E1E2E1]">Create your account</h1>
+        <p className="text-sm text-[#E1E2E1] mb-6">
           Sign up to start managing your properties or view your current property
         </p>
 
@@ -104,37 +104,37 @@ export default function Signup() {
           )}
 
           <div>
-            <label className="text-sm font-medium block mb-1">Email</label>
+            <label className="text-sm font-medium block mb-1 text-[#E1E2E1]">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full border border-[#34495E] bg-[#E1E2E1] rounded px-3 py-2 focus:ring-2 focus:ring-[#34495E] outline-none"
               placeholder=""
               required
             />
           </div>
 
           <div>
-            <label className="text-sm font-medium block mb-1">Password</label>
+            <label className="text-sm font-medium block mb-1 text-[#E1E2E1]">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full border border-[#34495E] bg-[#E1E2E1] rounded px-3 py-2 focus:ring-2 focus:ring-[#34495E] outline-none"
               required
             />
           </div>
 
           <div>
-            <label className="text-sm font-medium block mb-1">
+            <label className="text-sm font-medium block mb-1 text-[#E1E2E1]">
               Confirm password
             </label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full border border-[#34495E] bg-[#E1E2E1] rounded px-3 py-2 focus:ring-2 focus:ring-[#34495E] outline-none"
               required
             />
           </div>
@@ -169,15 +169,15 @@ export default function Signup() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 disabled:opacity-60"
+            className="w-full bg-[#E1E2E1] text-[#0D1B2A] py-2 rounded font-semibold hover:bg-[#34495E] hover:text-white disabled:opacity-60"
           >
             {loading ? "Creating account..." : "Create account"}
           </button>
         </form>
 
-        <p className="text-sm text-center text-gray-500 mt-4">
+        <p className="text-sm text-center text-[#E1E2E1] mt-4">
           Already have an account?{" "}
-          <Link to="/login" className="text-blue-600 hover:underline">
+          <Link to="/login" className="text-[#E1E2E1] hover:underline font-semibold">
             Sign in
           </Link>
         </p>

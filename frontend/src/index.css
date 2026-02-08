@@ -1,10 +1,14 @@
 @import "tailwindcss";
 
-
-
+:root {
+    --moonlight: #E1E2E1;
+    --midnight-sky: #34495E;
+    --deep-ocean: #1B3B6F;
+    --noir: #0D1B2A;
+}
 
 header{
-    @apply px-5 py-3 pb-3 border-b-4 border-b-[#e0e0e0] bg-[#FBFBFB]
+    @apply px-5 py-3 pb-3 border-b-4 border-b-[#34495E] bg-[#E1E2E1]
 
 }
 

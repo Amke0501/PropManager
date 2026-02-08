@@ -6,7 +6,7 @@ import { PropertiesManager } from "./dashboard-admin-components/PropertiesManage
 
 export const DashboardAdmin = () => {
     return (
-        <div className="page-wrapper bg-[#e5e5e5] min-h-screen px-4 sm:px-6 lg:px-8 py-4">
+        <div className="page-wrapper bg-[#0D1B2A] min-h-screen px-4 sm:px-6 lg:px-8 py-4">
             <div className="space-y-4 sm:space-y-6">
                 <Welcome/>
                 <Summary/>

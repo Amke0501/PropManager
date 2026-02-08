@@ -188,9 +188,9 @@ export const Summary = () => {
                     <div key={block.id}>
                         <button
                             onClick={block.onClick}
-                            className="w-full h-16 bg-white rounded-lg pt-4 pl-4 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] border-2 border-[#e0e0e0] hover:shadow-lg hover:border-blue-400 transition-all cursor-pointer text-left"
+                            className="w-full h-16 bg-[#E1E2E1] rounded-lg pt-4 pl-4 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] border-2 border-[#34495E] hover:shadow-lg hover:border-[#1B3B6F] transition-all cursor-pointer text-left"
                         >
-                            <div className="flex gap-3 items-center text-sm sm:text-base">
+                            <div className="flex gap-3 items-center text-sm sm:text-base text-[#0D1B2A]">
                                 {block.icon}
                                 <div className="truncate">
                                     {loading ? "Loading..." : block.heading}
@@ -204,23 +204,23 @@ export const Summary = () => {
             {/* Notices Modal */}
             {showNoticesModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <div className="bg-[#E1E2E1] rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-2xl font-bold">Notices & Announcements</h3>
+                            <h3 className="text-2xl font-bold text-[#0D1B2A]">Notices & Announcements</h3>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => {
                                         setShowNoticesModal(false);
                                         setShowCreateNoticeModal(true);
                                     }}
-                                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                    className="flex items-center gap-2 bg-[#1B3B6F] text-white px-4 py-2 rounded-lg hover:bg-[#34495E] transition-colors"
                                 >
                                     <Plus size={20} />
                                     Create Notice
                                 </button>
                                 <button
                                     onClick={() => setShowNoticesModal(false)}
-                                    className="text-gray-500 hover:text-gray-700"
+                                    className="text-[#34495E] hover:text-[#0D1B2A]"
                                 >
                                     <X size={24} />
                                 </button>
