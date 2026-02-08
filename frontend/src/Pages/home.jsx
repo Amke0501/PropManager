@@ -1,51 +1,59 @@
-import {Header} from "../components/Header/Header.jsx";
+
 //import {DashboardAdmin} from "../components/dashboard-admin/dashboard-admin.jsx";
 // should DashboardAdmin be in the landing page?
 import {Link} from "react-router-dom";
+import {HomeHeader} from "../components/Header/homeheader.jsx";
+import {ArrowDown, Banknote, Building2, Users, WrenchIcon} from "lucide-react";
+import {Footer} from "../components/Footer/footer.jsx";
 
 export const Home = () => {
     return (
         <div className="min-h-screen bg-gray-50">  {/*Haven't decided on the colour scheme yet*/}
-        <Header />
+        <HomeHeader />
         {/*<DashboardAdmin/>*/}
 
         {/*HERO SECTION*/}
-        <section className="bg-[#e5e5e5] text-white py-20">
-            <div className="max-w-7xl mx-auto px-6 text-center">
-                <h1 className="text-5xl font-bold mb-6 text-black">
-                    Prop.Manager
-                </h1>
-                <p className="text-xl mb-8 text-black">
-                    We manage properties, liase with tenants and attend to all related maintenance request so that that you can focus on what matters most.
-                </p>
+            <section id="hero" className="relative min-h-screen bg-img text-white overflow-hidden">
+                {/* blur + dark overlay */}
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+                {/* content */}
+                <div className="relative z-10 max-w-7xl mx-auto px-6 min-h-screen flex flex-col items-center justify-center text-center pt-24">
 
-                {/*BUTTONS*/}
-                <div className="flex gap-4 justify-center">
+                    <p className="text-xl max-w-2xl mb-10 text-[#E1E2E1]">
+                        Property management made easy so that you can focus on what matters most
+                    </p>
 
-                  {/*SIGN UP BUTTON*/}
-                  <Link to="/signup">  
-                  <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
-                    Sign Up
-                  </button>
-                   </Link>
-                  {/*LOGIN BUTTON*/} 
-                  <Link to="/login">
-                  <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
-                    Login
-                  </button>
-                  </Link>
+                    {/* buttons */}
+                    <div className="flex gap-4">
+                        <Link to="/signup">
+                            <button className="bg-[#1B3B6F] text-[#E1E2E1] px-8 py-3 rounded-lg font-semibold hover:bg-[#E1E2E1] hover:text-black transition">
+                                Sign Up
+                            </button>
+                        </Link>
 
+                        <Link to="/login">
+                            <button className="bg-[#1B3B6F] text-[#E1E2E1] px-8 py-3 rounded-lg font-semibold hover:bg-[#E1E2E1] hover:text-black transition">
+                                Login
+                            </button>
+                        </Link>
+                    </div>
+
+                    {/* arrow pinned to bottom */}
+                    <div className="absolute bottom-10 flex flex-col items-center animate-bounce text-[#E1E2E1]">
+                        <span className="text-sm mb-2">view more</span>
+                        <ArrowDown />
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        {/*FUNCTIONS/FEATURES SECTION*/}
-        <section className="py-20 px-6 bg-blue-600">
+
+            {/*FUNCTIONS/FEATURES SECTION*/}
+        <section className="py-20 px-6 bg-[#E1E2E1]">
             <div className="max-w-7xl mx-auto">
 
                 {/*FUNCTIONS/FEATURES */}
                 <h2 className="text-4xl font-bold text-center mb-4 text-black">
-                    Property management made easy. Manage smater and rent better. 
+                    Property management made easy. Manage smarter and rent better.
                 </h2>
                 <p className="text-center text-black mb-12">
                     Smart tools for managing properties with ease, all on one platform.
@@ -56,7 +64,7 @@ export const Home = () => {
 
                     {/*FEATURE 1*/}
                     <div className="bg-[#e5e5e5] p-6 rounded-lg shadow-lg hover:shadow-xl transition">
-                        <div className="text-5xl mb-4">🏢</div> {/*used windows key and . to get emoji*/}
+                        <div className="text-5xl mb-4"><Building2 className="size-12"/></div> {/*🏢used windows key and . to get emoji*/}
                         <h3 className="text-xl font-bold mb-2 text-gray-800">
                             Properties
                         </h3>
@@ -67,7 +75,7 @@ export const Home = () => {
 
                     {/*FEATURE 2*/}
                     <div className="bg-[#e5e5e5] p-6 rounded-lg shadow-lg hover:shadow-xl transition">
-                        <div className="text-5xl mb-4">👥</div> {/*used windows key and . to get emoji*/}
+                        <div className="text-5xl mb-4"><Users className="size-12"/></div> {/*👥used windows key and . to get emoji*/}
                         <h3 className="text-xl font-bold mb-2 text-gray-800">
                             Tenants
                         </h3>
@@ -78,7 +86,7 @@ export const Home = () => {
 
                     {/*FEATURE 3*/}
                     <div className="bg-[#e5e5e5] p-6 rounded-lg shadow-lg hover:shadow-xl transition">
-                        <div className="text-5xl mb-4">💸</div> {/*used windows key and . to get emoji*/}
+                        <div className="text-5xl mb-4"><Banknote className="size-12"/></div> {/*💸used windows key and . to get emoji*/}
                         <h3 className="text-xl font-bold mb-2 text-gray-800">
                             Rent Payments
                         </h3>
@@ -89,7 +97,7 @@ export const Home = () => {
 
                     {/*FEATURE 4*/}
                     <div className="bg-[#e5e5e5] p-6 rounded-lg shadow-lg hover:shadow-xl transition">
-                        <div className="text-5xl mb-4">⛏️</div> {/*used windows key and . to get emoji*/}
+                        <div className="text-5xl mb-4"><WrenchIcon className="size-12"/></div> {/*⛏️used windows key and . to get emoji*/}
                         <h3 className="text-xl font-bold mb-2 text-gray-800">
                             Maintenance
                         </h3>
@@ -110,23 +118,16 @@ export const Home = () => {
                  Ready to simplify your property management and maximize on your returns?
                 </h2>
                 <p className="text-xl mb-8 text-black">
-                    Get started with Join Prop.Manager and get started today!
+                    Get started and join Prop.Manager today!
                 </p>
                 
             </div>
         </section>
 
         {/*FOOTER SECTION*/}
-        <footer className="bg-gray-800 text-white py-8 px-6">
-            <div className="max-w-7xl mx-autto text-center">
-                <p className="text-gray-400">
-                    Prop.Manager. Built for property management 
-                </p>
-                
-            </div>
-        </footer>
-
-
+        <div>
+            <Footer/>
+        </div>
         </div>
     )
 }

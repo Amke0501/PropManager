@@ -1,9 +1,11 @@
 import {Folder, House, HouseHeart, LogOut, MessageCircle, UserRound} from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {useState} from "react";
 
 
 export const Header = () => {
     const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
 
     const handleLogout = () => {
         // Clear authentication token from localStorage
@@ -70,6 +72,13 @@ export const Header = () => {
                         <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-200 hover:text-black p-2 rounded-2xl">
                             <MessageCircle/>
                             <div className="font-medium">Messages</div>
+                        </div>
+                        <div
+                            onClick={handleLogout}
+                            className="flex items-center gap-1 sm:gap-2 cursor-pointer hover:bg-red-100 p-2 rounded-2xl text-red-600"
+                        >
+                            <LogOut size={20} className="sm:size-[20px]"/>
+                            <div className="font-medium hidden sm:inline text-sm">Logout</div>
                         </div>
                     </div>
                 </div>
