@@ -22,7 +22,6 @@ export const DashboardUser = () => {
                 <div className="p-4 sm:p-6">
                     <UserProfile/>
                 </div>
-
             </div>
         </div>
     )

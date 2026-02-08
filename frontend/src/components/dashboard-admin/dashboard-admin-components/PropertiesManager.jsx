@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
-import { propertiesAPI } from '../../../services/api';
+import { propertiesAPI } from '../../../Services/api';
 
 export const PropertiesManager = () => {
     const [properties, setProperties] = useState([]);
@@ -21,7 +21,7 @@ export const PropertiesManager = () => {
     const fetchProperties = async () => {
         try {
             const data = await propertiesAPI.getAll();
-            setProperties(data);
+            setProperties(data?.data ?? data ?? []);
         } catch (error) {
             console.error('Error fetching properties:', error);
         } finally {
@@ -31,16 +31,21 @@ export const PropertiesManager = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('Form submitted with data:', formData);
         try {
             if (editingProperty) {
+                console.log('Updating property:', editingProperty.id);
                 await propertiesAPI.update(editingProperty.id, formData);
             } else {
-                await propertiesAPI.create(formData);
+                console.log('Creating new property');
+                const result = await propertiesAPI.create(formData);
+                console.log('Property created:', result);
             }
             fetchProperties();
             handleCloseModal();
         } catch (error) {
             console.error('Error saving property:', error);
+            alert(`Error: ${error.message}`);
         }
     };
 
@@ -84,7 +89,10 @@ export const PropertiesManager = () => {
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold">Properties</h2>
                 <button
-                    onClick={() => setShowModal(true)}
+                    onClick={() => {
+                        console.log('Add Property button clicked');
+                        setShowModal(true);
+                    }}
                     className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                     <Plus size={20} />

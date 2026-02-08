@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 // test Supabase connection
 app.get('/api/test-supabase', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('PropManager').select('*').limit(1);
+    const { data, error } = await supabase.from('users').select('*').limit(1);
 
     if (error) throw error;
 
@@ -53,6 +53,7 @@ const maintenanceRoutes = require('./routes/maintenance');
 const paymentsRoutes = require('./routes/payments');
 const reportRoutes = require('./routes/reports');
 const tenantRoutes = require('./routes/tenants');
+const noticeRoutes = require('./routes/notices');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/communication',messageRoutes);
@@ -62,6 +63,7 @@ app.use('/api/properties', propertyRoutes);
 app.use('/api/tenants', tenantRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/notices', noticeRoutes);
 
 // Root route
 app.get('/api', (req, res) => {

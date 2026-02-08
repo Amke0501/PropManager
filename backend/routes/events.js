@@ -41,7 +41,8 @@ router.post('/', auth, async (req, res) => {
             time,
             description: description || '',
             user_id: req.user.id,
-            created_by: userRole
+            created_by: userRole,
+            status: userRole === 'admin' ? 'confirmed' : 'pending'
         };
 
         const { data, error } = await supabase
@@ -57,13 +58,13 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Update event
-router.put('/:id', auth, requireAdmin, async (req, res) => {
+router.put('/:id', auth, requireAdmin('admin'), async (req, res) => {
     try {
-        const { title, property, type, date, time, description } = req.body;
+        const { title, property, type, date, time, description, status } = req.body;
 
         const { data, error } = await supabase
             .from('events')
-            .update({ title, property, type, date, time, description })
+            .update({ title, property, type, date, time, description, status })
             .eq('id', req.params.id)
             .select();
 
@@ -75,7 +76,7 @@ router.put('/:id', auth, requireAdmin, async (req, res) => {
 });
 
 // Delete event
-router.delete('/:id', auth, requireAdmin, async (req, res) => {
+router.delete('/:id', auth, requireAdmin('admin'), async (req, res) => {
     try {
         const { error } = await supabase
             .from('events')
@@ -84,6 +85,44 @@ router.delete('/:id', auth, requireAdmin, async (req, res) => {
 
         if (error) throw error;
         res.json({ message: 'Event deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Confirm event/notice (admin only)
+router.put('/:id/confirm', auth, requireAdmin('admin'), async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('events')
+            .update({
+                status: 'confirmed',
+                confirmed_by: req.user.id
+            })
+            .eq('id', req.params.id)
+            .select();
+
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Complete event/notice (admin only)
+router.put('/:id/complete', auth, requireAdmin('admin'), async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('events')
+            .update({
+                status: 'completed',
+                completed_at: new Date().toISOString()
+            })
+            .eq('id', req.params.id)
+            .select();
+
+        if (error) throw error;
+        res.json(data);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

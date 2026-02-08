@@ -13,7 +13,7 @@ export const Home = () => {
         <section className="bg-[#e5e5e5] text-white py-20">
             <div className="max-w-7xl mx-auto px-6 text-center">
                 <h1 className="text-5xl font-bold mb-6 text-black">
-                    Prop.Manger
+                    Prop.Manager
                 </h1>
                 <p className="text-xl mb-8 text-black">
                     We manage properties, liase with tenants and attend to all related maintenance request so that that you can focus on what matters most.

@@ -1,7 +1,14 @@
 // import packages
 const express = require('express');
 const router = express.Router();
+const { createClient } = require('@supabase/supabase-js');
 const supabase = require('../supabaseClient');
+
+// Use anon key for user password sign-in
+const supabaseAnon = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
 // POST /api/auth/signup - Register new user with Supabase
 router.post('/signup', async (req, res) => {
@@ -18,10 +25,16 @@ router.post('/signup', async (req, res) => {
 
     // Sign up user with Supabase Auth
     // Use admin API to create user
+    const normalizedRole = role === 'user' ? 'tenant' : (role || 'tenant');
+
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
       password,
-      user_metadata: {},
+      user_metadata: {
+        role: normalizedRole,
+        first_name: firstName,
+        last_name: lastName
+      },
       email_confirm: true  // Auto-confirm email to skip verification
     });
 
@@ -64,7 +77,7 @@ router.post('/signup', async (req, res) => {
         email,
         first_name: firstName,
         last_name: lastName,
-        role: role || 'tenant'
+        role: normalizedRole
       }])
       .select()
       .single();
@@ -81,7 +94,7 @@ router.post('/signup', async (req, res) => {
           email: email,
           firstName: firstName,
           lastName: lastName,
-          role: role || 'tenant'
+          role: normalizedRole
         },
         session: null
       });
@@ -89,7 +102,10 @@ router.post('/signup', async (req, res) => {
     }
 
     // Generate a session token for the newly created user
-    const { data: sessionData, error: sessionError } = await supabase.auth.admin.createSession(authData.user.id);
+    const { data: sessionData, error: sessionError } = await supabaseAnon.auth.signInWithPassword({
+      email,
+      password
+    });
     
     if (sessionError) {
       console.error('Session creation error:', sessionError);
@@ -145,7 +161,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Sign in with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabaseAnon.auth.signInWithPassword({
       email,
       password
     });
@@ -153,13 +169,38 @@ router.post('/login', async (req, res) => {
     if (authError) throw authError;
 
     // Get user record from database
-    const { data: user, error: dbError } = await supabase
+    let { data: user, error: dbError } = await supabase
       .from('users')
       .select('*')
       .eq('id', authData.user.id)
       .single();
 
-    if (dbError) throw dbError;
+    // If user profile is missing, create it from auth metadata
+    if (dbError) {
+      const isNotFound = dbError.code === 'PGRST116' || dbError.status === 406;
+
+      if (!isNotFound) throw dbError;
+
+      const metadata = authData.user.user_metadata || {};
+      const fallbackRole = metadata.role === 'user' ? 'tenant' : (metadata.role || 'tenant');
+
+      const { data: createdUser, error: createError } = await supabase
+        .from('users')
+        .insert([{
+          id: authData.user.id,
+          email: authData.user.email,
+          first_name: metadata.first_name || authData.user.email?.split('@')[0] || 'User',
+          last_name: metadata.last_name || 'User',
+          role: fallbackRole
+        }])
+        .select()
+        .single();
+
+      if (createError) throw createError;
+      user = createdUser;
+    }
+
+    const responseRole = user.role === 'user' ? 'tenant' : user.role;
 
     res.json({
       success: true,
@@ -170,14 +211,17 @@ router.post('/login', async (req, res) => {
         email: user.email,
         firstName: user.first_name,
         lastName: user.last_name,
-        role: user.role
+        role: responseRole
       }
     });
   } catch (error) {
     console.error('Login error:', error);
+    const errorMessage = error?.message?.includes('Email not confirmed')
+      ? 'Email not confirmed'
+      : 'Invalid credentials';
     res.status(401).json({ 
       success: false, 
-      message: 'Invalid credentials',
+      message: errorMessage,
       error: error.message 
     });
   }
@@ -252,6 +296,124 @@ router.get('/me', async (req, res) => {
     res.status(401).json({ 
       success: false, 
       message: 'Error fetching user',
+      error: error.message 
+    });
+  }
+});
+
+// PUT /api/auth/profile - Update user profile
+router.put('/profile', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'No token provided' 
+      });
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    // Get user from Supabase
+    const { data, error } = await supabase.auth.getUser(token);
+
+    if (error || !data.user) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Invalid token' 
+      });
+    }
+
+    const { firstName, lastName, phone, address } = req.body;
+
+    // Update user profile in database
+    const { data: updatedUser, error: dbError } = await supabase
+      .from('users')
+      .update({
+        first_name: firstName,
+        last_name: lastName,
+        phone: phone || null,
+        address: address || null
+      })
+      .eq('id', data.user.id)
+      .select()
+      .single();
+
+    if (dbError) throw dbError;
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        firstName: updatedUser.first_name,
+        lastName: updatedUser.last_name,
+        phone: updatedUser.phone,
+        address: updatedUser.address,
+        role: updatedUser.role
+      }
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error updating profile',
+      error: error.message 
+    });
+  }
+});
+
+// POST /api/auth/change-password - Change user password
+router.post('/change-password', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'No token provided' 
+      });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const { newPassword } = req.body;
+
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long'
+      });
+    }
+
+    // Get user from Supabase
+    const { data, error } = await supabase.auth.getUser(token);
+
+    if (error || !data.user) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Invalid token' 
+      });
+    }
+
+    // Update password using admin API
+    const { error: updateError } = await supabase.auth.admin.updateUserById(
+      data.user.id,
+      { password: newPassword }
+    );
+
+    if (updateError) throw updateError;
+
+    res.json({
+      success: true,
+      message: 'Password changed successfully'
+    });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error changing password',
       error: error.message 
     });
   }

@@ -137,3 +137,20 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+# Documentation files (local only, not for Git)
+START_HERE.md
+FINAL_SUMMARY.md
+STUDENT_GUIDE.md
+LATEST_CHANGES.md
+GROUP_CHECKLIST.md
+FINAL_UPDATE.md
+SHARING_GUIDE.md
+DOCUMENTATION_INDEX.md
+DEBUG_NOTES.md
+USER_GUIDE.md
+FEATURE_VERIFICATION.md
+CHANGES_SUMMARY.md
+COMPLETION_REPORT.md
+IMPLEMENTATION_SUMMARY.md
+GROUP_REPORT.md
+PROJECT_STATUS.txt

@@ -14,7 +14,7 @@ export default function Signup() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [role, setRole] = useState("user") 
+  const [role, setRole] = useState("tenant") 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -47,7 +47,7 @@ export default function Signup() {
           password,                           // User's password from form input
           firstName: email.split('@')[0],    // Extract name from email (before @)
           lastName: 'User',                   // Default value (backend requires non-empty)
-          role                                // "user" or "admin" from radio selection
+          role                                // "tenant" or "admin" from radio selection
         })
       });
 
@@ -147,11 +147,11 @@ export default function Signup() {
               <label className="flex items-center gap-2 text-sm">
                 <input
                   type="radio"
-                  value="user"
-                  checked={role === "user"}
-                  onChange={() => setRole("user")}
+                  value="tenant"
+                  checked={role === "tenant"}
+                  onChange={() => setRole("tenant")}
                 />
-                User
+                Tenant
               </label>
 
               <label className="flex items-center gap-2 text-sm">

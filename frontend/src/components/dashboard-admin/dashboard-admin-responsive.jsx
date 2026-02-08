@@ -1,11 +1,10 @@
-import {Welcome} from "./dashboard-user-components/Welcome.jsx";
-import {Summary} from "./dashboard-user-components/Summary section.jsx";
-import {Options} from "./dashboard-user-components/options.jsx";
-import {UpcomingActivity} from "./dashboard-user-components/upcomingActivity.jsx";
-import {UserProfile} from "./dashboard-user-components/UserProfile.jsx";
+import { Welcome } from "./dashboard-admin-components/Welcome.jsx";
+import { Summary } from "./dashboard-admin-components/Summary section.jsx";
+import { Overview } from "./dashboard-admin-components/overview.jsx";
+import { UpcomingActivity } from "./dashboard-admin-components/upcomingActivity.jsx";
+import { PropertiesManager } from "./dashboard-admin-components/PropertiesManager.jsx";
 
-
-export const DashboardUser = () => {
+export const DashboardAdmin = () => {
     return (
         <div className="page-wrapper bg-[#e5e5e5] min-h-screen px-4 sm:px-6 lg:px-8 py-4">
             <div className="space-y-4 sm:space-y-6">
@@ -13,16 +12,13 @@ export const DashboardUser = () => {
                 <Summary/>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                     <div className="lg:col-span-1">
-                        <Options/>
+                        <Overview/>
                     </div>
                     <div className="lg:col-span-2">
                         <UpcomingActivity/>
                     </div>
                 </div>
-                <div className="p-4 sm:p-6">
-                    <UserProfile/>
-                </div>
-
+                <PropertiesManager/>
             </div>
         </div>
     )

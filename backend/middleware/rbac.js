@@ -33,16 +33,18 @@ const rbac = (allowedRoles) => {
       // Convert single role string to array for consistency
       const rolesArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
 
+      const normalizedRole = user.role === 'user' ? 'tenant' : user.role;
+
       // Check if user's role is in allowed roles
-      if (!rolesArray.includes(user.role)) {
+      if (!rolesArray.includes(normalizedRole)) {
         return res.status(403).json({ 
           success: false, 
-          message: `Access denied. Required role(s): ${rolesArray.join(', ')}. Your role: ${user.role}` 
+          message: `Access denied. Required role(s): ${rolesArray.join(', ')}. Your role: ${normalizedRole}` 
         });
       }
 
       // Store user role in request for later use
-      req.user.role = user.role;
+      req.user.role = normalizedRole;
 
       next();
     } catch (error) {

@@ -51,7 +51,7 @@ router.get("/", auth, async (req, res) => {
 });
 
   //Updates maintenace status , only admins allowed
-  router.put("/:id", auth, requireAdmin, async (req, res) => {
+  router.put("/:id", auth, requireAdmin('admin'), async (req, res) => {
   const { status } = req.body;
   const { id } = req.params;
 

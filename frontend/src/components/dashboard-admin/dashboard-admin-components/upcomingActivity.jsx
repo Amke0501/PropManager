@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Home, Clock, Plus, Pencil, Trash2, X } from "lucide-react";
-import { eventsAPI } from "../../../services/api";
+import { eventsAPI } from "../../../Services/api";
 
 export const UpcomingActivity = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -9,6 +9,7 @@ export const UpcomingActivity = () => {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingEvent, setEditingEvent] = useState(null);
+    const [activeTab, setActiveTab] = useState('upcoming');
     const [formData, setFormData] = useState({
         title: '',
         property: '',
@@ -19,13 +20,15 @@ export const UpcomingActivity = () => {
 
     useEffect(() => {
         fetchEvents();
+        const intervalId = setInterval(fetchEvents, 30000);
+        return () => clearInterval(intervalId);
     }, []);
 
     const fetchEvents = async () => {
         try {
             const data = await eventsAPI.getAll();
             // Convert date strings to Date objects
-            const formattedEvents = data.map(event => ({
+            const formattedEvents = (data?.data ?? data ?? []).map(event => ({
                 ...event,
                 date: new Date(event.date)
             }));
@@ -68,6 +71,26 @@ export const UpcomingActivity = () => {
                 console.error('Error deleting event:', error);
                 alert('Failed to delete event');
             }
+        }
+    };
+
+    const handleConfirm = async (eventId) => {
+        try {
+            await eventsAPI.confirm(eventId);
+            fetchEvents();
+        } catch (error) {
+            console.error('Error confirming event:', error);
+            alert('Failed to confirm notice');
+        }
+    };
+
+    const handleComplete = async (eventId) => {
+        try {
+            await eventsAPI.complete(eventId);
+            fetchEvents();
+        } catch (error) {
+            console.error('Error completing event:', error);
+            alert('Failed to complete notice');
         }
     };
 
@@ -165,6 +188,9 @@ export const UpcomingActivity = () => {
         return getEventsForDate(selectedDate);
     };
 
+    const upcomingEvents = events.filter((event) => event.status !== 'completed');
+    const pastEvents = events.filter((event) => event.status === 'completed');
+
     const monthNames = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
@@ -185,9 +211,9 @@ export const UpcomingActivity = () => {
 
     return (
         <div className="mt-6">
-            <div className="w-[740px] h-[480px] border-2 transition-all duration-200 hover:shadow-lg border-gray-200 bg-white rounded-2xl px-4 py-1 flex gap-4">
+            <div className="w-full border-2 transition-all duration-200 hover:shadow-lg border-gray-200 bg-white rounded-2xl px-4 py-4 flex flex-col lg:flex-row gap-4 relative">
                 {/* Calendar Section */}
-                <div className="flex-1 flex flex-col">
+                <div className="flex-1 flex flex-col relative z-0">
                     {/* Calendar Header */}
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-xl font-semibold text-gray-900">
@@ -280,30 +306,60 @@ export const UpcomingActivity = () => {
                 </div>
 
                 {/* Events Sidebar */}
-                <div className="w-64 border-l border-gray-200 pl-4 flex flex-col pt-3">
+                <div className="w-full lg:w-64 border-t lg:border-t-0 lg:border-l border-gray-200 pt-4 lg:pt-3 lg:pl-4 flex flex-col relative z-10 pointer-events-auto">
                     <div className="mb-4">
                         <h3 className="text-sm font-semibold text-gray-900 mb-1">
                             {selectedDate
                                 ? `Events for ${monthNames[currentDate.getMonth()]} ${selectedDate}`
-                                : "Upcoming Events"}
+                                : activeTab === 'past' ? "Past Events" : "Upcoming Events"}
                         </h3>
                         <p className="text-xs text-gray-500">
-                            {selectedDate ? getEventsForSelectedDate().length : events.length}{" "}
+                            {selectedDate
+                                ? getEventsForSelectedDate().length
+                                : activeTab === 'past'
+                                    ? pastEvents.length
+                                    : upcomingEvents.length}{" "}
                             event(s)
                         </p>
+                        {!selectedDate && (
+                            <div className="mt-2 flex gap-2 text-xs">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('upcoming')}
+                                    className={`px-2 py-1 rounded ${
+                                        activeTab === 'upcoming'
+                                            ? 'bg-blue-100 text-blue-700'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    Upcoming
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('past')}
+                                    className={`px-2 py-1 rounded ${
+                                        activeTab === 'past'
+                                            ? 'bg-blue-100 text-blue-700'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    Past
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex-1 overflow-y-auto space-y-3">
                         {(selectedDate
-                                ? getEventsForSelectedDate()
-                                : events.slice(0, 5)
+                            ? getEventsForSelectedDate()
+                            : (activeTab === 'past' ? pastEvents : upcomingEvents).slice(0, 5)
                         ).map((event) => (
                             <div
                                 key={event.id}
-                                className={`p-3 rounded-lg border ${getEventTypeColor(event.type)} transition-all hover:shadow-md group`}
+                                className={`relative p-3 rounded-lg border ${getEventTypeColor(event.type)} transition-all hover:shadow-md group pointer-events-auto`}
                             >
                                 <div className="flex items-start gap-2 mb-2">
-                                    <Home className="size-4 mt-0.5 flex-shrink-0" />
+                                    <Home className="size-4 mt-0.5 shrink-0" />
                                     <div className="flex-1 min-w-0">
                                         <h4 className="font-semibold text-sm truncate">
                                             {event.title}
@@ -311,6 +367,11 @@ export const UpcomingActivity = () => {
                                         <p className="text-xs truncate opacity-80">
                                             {event.property}
                                         </p>
+                                        {event.status && (
+                                            <p className="text-xs mt-1 font-medium">
+                                                Status: {event.status}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button
@@ -339,6 +400,40 @@ export const UpcomingActivity = () => {
                   </span>
                                     <span className="ml-auto">{event.time}</span>
                                 </div>
+                                {event.created_by !== 'admin' && event.status !== 'completed' && (
+                                    <div className="mt-2 flex gap-2 relative z-50" style={{pointerEvents: 'auto'}}>
+                                        {event.status !== 'confirmed' && event.status !== 'completed' && (
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    console.log('Confirm clicked for event:', event.id);
+                                                    handleConfirm(event.id);
+                                                }}
+                                                className="text-xs px-2 py-1 rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200 cursor-pointer"
+                                                style={{pointerEvents: 'auto', position: 'relative', zIndex: 100}}
+                                            >
+                                                Confirm
+                                            </button>
+                                        )}
+                                        {event.status !== 'completed' && (
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    console.log('Mark Done clicked for event:', event.id);
+                                                    handleComplete(event.id);
+                                                }}
+                                                className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 cursor-pointer"
+                                                style={{pointerEvents: 'auto', position: 'relative', zIndex: 100}}
+                                            >
+                                                Mark Done
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         ))}
 

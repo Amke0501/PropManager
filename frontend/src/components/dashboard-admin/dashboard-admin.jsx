@@ -6,14 +6,20 @@ import { PropertiesManager } from "./dashboard-admin-components/PropertiesManage
 
 export const DashboardAdmin = () => {
     return (
-        <div className="page-wrapper bg-[#e5e5e5] min-h-screen">
-            <Welcome/>
-            <Summary/>
-            <div className="flex gap-6">
-                <Overview/>
-                <UpcomingActivity/>
+        <div className="page-wrapper bg-[#e5e5e5] min-h-screen px-4 sm:px-6 lg:px-8 py-4">
+            <div className="space-y-4 sm:space-y-6">
+                <Welcome/>
+                <Summary/>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                    <div className="lg:col-span-1">
+                        <Overview/>
+                    </div>
+                    <div className="lg:col-span-2">
+                        <UpcomingActivity/>
+                    </div>
+                </div>
+                <PropertiesManager/>
             </div>
-            <PropertiesManager/>
         </div>
     )
 }
