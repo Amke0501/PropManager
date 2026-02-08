@@ -1,12 +1,24 @@
 @import "tailwindcss";
 
 header{
-    @apply px-5 py-3 pb-3 border-b-4 border-b-[#e0e0e0] bg-[#FBFBFB]
+    @apply px-5 py-3 pb-3 bg-transparent
+}
 
+.bg-img{
+    background-image: url("../home-prop2.jpg");
+    background-color: cornflowerblue;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 
+
 @media screen and (min-width: 0px) {
+    .bg-img{
+        max-height: 95vh;
+    }
+
+
     .nav-visibility{
         @apply hidden
     }
