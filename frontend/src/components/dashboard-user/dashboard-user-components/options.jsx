@@ -1,31 +1,91 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import { maintenanceAPI, eventsAPI } from '../../../services/api';
+import { maintenanceAPI, eventsAPI, propertiesAPI, paymentsAPI } from '../../../Services/api';
 
 export const Options = () => {
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState('');
+    const [properties, setProperties] = useState([]);
+    const [propertiesLoading, setPropertiesLoading] = useState(false);
+    const [balanceInfo, setBalanceInfo] = useState({
+        totalDue: 0,
+        paidThisMonth: 0,
+        outstanding: 0
+    });
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        property: '',
+        propertyId: '',
+        propertyLabel: '',
         date: '',
         time: '09:00',
-        type: 'meeting'
+        type: 'meeting',
+        paymentAmount: ''
     });
+
+    const fetchProperties = async () => {
+        setPropertiesLoading(true);
+        try {
+            const response = await propertiesAPI.getAll();
+            const data = response?.data ?? response ?? [];
+            setProperties(data);
+        } catch (error) {
+            console.error('Error fetching properties:', error);
+            setProperties([]);
+        } finally {
+            setPropertiesLoading(false);
+        }
+    };
+
+    const fetchBalanceInfo = async () => {
+        try {
+            const [propertiesResponse, paymentsResponse] = await Promise.all([
+                propertiesAPI.getAll().catch(() => ({ data: [] })),
+                paymentsAPI.getAll().catch(() => [])
+            ]);
+
+            const propertyData = propertiesResponse?.data ?? propertiesResponse ?? [];
+            const paymentData = paymentsResponse?.data ?? paymentsResponse ?? [];
+
+            const totalDue = propertyData
+                .filter((p) => p.tenant_id != null)
+                .reduce((sum, p) => sum + (parseFloat(p.rent) || 0), 0);
+
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            const paidThisMonth = paymentData
+                .filter((payment) => !payment.month || payment.month === currentMonth)
+                .reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0);
+
+            const outstanding = Math.max(totalDue - paidThisMonth, 0);
+
+            setBalanceInfo({ totalDue, paidThisMonth, outstanding });
+        } catch (error) {
+            console.error('Error fetching balance info:', error);
+            setBalanceInfo({ totalDue: 0, paidThisMonth: 0, outstanding: 0 });
+        }
+    };
 
     const handleOptionClick = (type) => {
         setModalType(type);
         setShowModal(true);
 
+        if (type === 'notice' || type === 'maintenance') {
+            fetchProperties();
+        }
+        if (type === 'payment' || type === 'balance') {
+            fetchBalanceInfo();
+        }
+
         // Reset form with appropriate defaults
         setFormData({
             title: '',
             description: '',
-            property: '',
+            propertyId: '',
+            propertyLabel: '',
             date: new Date().toISOString().split('T')[0],
             time: '09:00',
-            type: type === 'notice' ? 'meeting' : type === 'maintenance' ? 'maintenance' : 'meeting'
+            type: type === 'notice' ? 'meeting' : type === 'maintenance' ? 'maintenance' : 'meeting',
+            paymentAmount: ''
         });
     };
 
@@ -35,10 +95,14 @@ export const Options = () => {
         try {
             switch(modalType) {
                 case 'notice':
+                    if (!formData.propertyId) {
+                        alert('Please select a property');
+                        return;
+                    }
                     // Submit notice as calendar event
                     await eventsAPI.create({
                         title: formData.title,
-                        property: formData.property,
+                        property: formData.propertyLabel || formData.propertyId,
                         type: 'meeting',
                         date: formData.date,
                         time: formData.time,
@@ -48,17 +112,21 @@ export const Options = () => {
                     break;
 
                 case 'maintenance':
+                    if (!formData.propertyId) {
+                        alert('Please select a property');
+                        return;
+                    }
                     // Submit maintenance request (both to maintenance table and calendar)
                     await maintenanceAPI.create({
                         title: formData.title,
                         description: formData.description,
-                        property_id: formData.property
+                        property_id: formData.propertyId
                     });
 
                     // Also add to calendar
                     await eventsAPI.create({
                         title: `Maintenance: ${formData.title}`,
-                        property: formData.property,
+                        property: formData.propertyLabel || formData.propertyId,
                         type: 'maintenance',
                         date: formData.date,
                         time: formData.time,
@@ -69,9 +137,24 @@ export const Options = () => {
                     break;
 
                 case 'payment':
-                    // Handle payment
-                    console.log('Processing payment:', formData);
-                    alert('Payment processed successfully!');
+                    if (!formData.paymentAmount) {
+                        alert('Please enter a payment amount');
+                        return;
+                    }
+                    await paymentsAPI.submit({
+                        amount: formData.paymentAmount,
+                        month: new Date().toISOString().slice(0, 7)
+                    });
+                    await eventsAPI.create({
+                        title: `Payment Request: R${formData.paymentAmount}`,
+                        property: formData.propertyLabel || 'Tenant Payment',
+                        type: 'payment',
+                        date: new Date().toISOString().split('T')[0],
+                        time: new Date().toTimeString().slice(0, 5),
+                        description: `Tenant submitted a payment request for R${formData.paymentAmount}`
+                    });
+                    await fetchBalanceInfo();
+                    alert('Payment submitted successfully!');
                     break;
 
                 case 'balance':
@@ -153,14 +236,28 @@ export const Options = () => {
                             <label className="block text-sm font-medium mb-1">
                                 Property/Unit
                             </label>
-                            <input
-                                type="text"
-                                value={formData.property}
-                                onChange={(e) => setFormData({ ...formData, property: e.target.value })}
+                            <select
+                                value={formData.propertyId}
+                                onChange={(e) => {
+                                    const selected = properties.find((p) => String(p.id) === e.target.value);
+                                    setFormData({
+                                        ...formData,
+                                        propertyId: e.target.value,
+                                        propertyLabel: selected ? `${selected.name || ''} ${selected.address || ''}`.trim() : ''
+                                    });
+                                }}
                                 className="w-full border border-gray-300 rounded px-3 py-2"
-                                placeholder="Your unit number"
                                 required
-                            />
+                            >
+                                <option value="">
+                                    {propertiesLoading ? 'Loading properties...' : 'Select your property'}
+                                </option>
+                                {properties.map((property) => (
+                                    <option key={property.id} value={property.id}>
+                                        {property.name || 'Property'} - {property.address}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className="mb-4">
@@ -252,14 +349,28 @@ export const Options = () => {
                             <label className="block text-sm font-medium mb-1">
                                 Property/Unit
                             </label>
-                            <input
-                                type="text"
-                                value={formData.property}
-                                onChange={(e) => setFormData({ ...formData, property: e.target.value })}
+                            <select
+                                value={formData.propertyId}
+                                onChange={(e) => {
+                                    const selected = properties.find((p) => String(p.id) === e.target.value);
+                                    setFormData({
+                                        ...formData,
+                                        propertyId: e.target.value,
+                                        propertyLabel: selected ? `${selected.name || ''} ${selected.address || ''}`.trim() : ''
+                                    });
+                                }}
                                 className="w-full border border-gray-300 rounded px-3 py-2"
-                                placeholder="Your unit number"
                                 required
-                            />
+                            >
+                                <option value="">
+                                    {propertiesLoading ? 'Loading properties...' : 'Select your property'}
+                                </option>
+                                {properties.map((property) => (
+                                    <option key={property.id} value={property.id}>
+                                        {property.name || 'Property'} - {property.address}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className="mb-4">
@@ -321,7 +432,7 @@ export const Options = () => {
 
             case 'payment':
                 return (
-                    <div className="w-full">
+                    <form onSubmit={handleSubmit} className="w-full">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-xl font-bold">Make a Payment</h3>
                             <button
@@ -335,7 +446,7 @@ export const Options = () => {
 
                         <div className="mb-4">
                             <p className="text-sm text-gray-600 mb-4">
-                                Current Balance: <span className="font-bold text-lg">R5,500</span>
+                                Current Balance: <span className="font-bold text-lg">R{balanceInfo.outstanding.toFixed(2)}</span>
                             </p>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium mb-1">
@@ -343,8 +454,11 @@ export const Options = () => {
                                 </label>
                                 <input
                                     type="number"
+                                    value={formData.paymentAmount}
+                                    onChange={(e) => setFormData({ ...formData, paymentAmount: e.target.value })}
                                     className="w-full border border-gray-300 rounded px-3 py-2"
                                     placeholder="Enter amount"
+                                    min="0"
                                 />
                             </div>
                             <div className="mb-4">
@@ -360,22 +474,20 @@ export const Options = () => {
                         </div>
                         <div className="flex gap-2">
                             <button
+                                type="button"
                                 onClick={handleCloseModal}
                                 className="flex-1 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
-                                onClick={() => {
-                                    alert('Payment processed!');
-                                    handleCloseModal();
-                                }}
+                                type="submit"
                                 className="flex-1 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
                             >
                                 Pay Now
                             </button>
                         </div>
-                    </div>
+                    </form>
                 );
 
             case 'balance':
@@ -395,11 +507,11 @@ export const Options = () => {
                         <div className="space-y-3">
                             <div className="flex justify-between py-2 border-b">
                                 <span>Current Rent:</span>
-                                <span className="font-semibold">R5,000</span>
+                                <span className="font-semibold">R{balanceInfo.totalDue.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between py-2 border-b">
-                                <span>Late Fees:</span>
-                                <span className="font-semibold text-red-600">R500</span>
+                                <span>Payments This Month:</span>
+                                <span className="font-semibold text-emerald-600">-R{balanceInfo.paidThisMonth.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between py-2 border-b">
                                 <span>Previous Balance:</span>
@@ -407,7 +519,7 @@ export const Options = () => {
                             </div>
                             <div className="flex justify-between py-2 text-lg font-bold">
                                 <span>Total Due:</span>
-                                <span className="text-red-600">R5,500</span>
+                                <span className="text-red-600">R{balanceInfo.outstanding.toFixed(2)}</span>
                             </div>
                         </div>
                         <button
@@ -427,14 +539,14 @@ export const Options = () => {
     return (
         <div className="mt-1">
             <div className="py-4 font-semibold text-xl">Options</div>
-            <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
                 {Opts.map((Opt, index) => (
                     <div key={index}>
                         <div
                             onClick={Opt.action}
-                            className="option-blocks bg-white hover:bg-[#e0e0e0] hover:border-l-black cursor-pointer rounded-lg pt-4 pl-4 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] border-2 border-[#e0e0e0] transition-all duration-200"
+                            className="w-full h-16 bg-white hover:bg-[#e0e0e0] hover:border-l-black cursor-pointer rounded-lg pt-4 pl-4 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] border-2 border-[#e0e0e0] transition-all duration-200"
                         >
-                            <div className="flex">{Opt.button}</div>
+                            <div className="flex text-sm sm:text-base">{Opt.button}</div>
                         </div>
                     </div>
                 ))}

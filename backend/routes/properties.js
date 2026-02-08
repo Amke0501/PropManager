@@ -12,12 +12,14 @@ router.get('/', requireAuth, async (req, res) => {
 
     let query = supabase.from('properties').select('*');
 
-    // Filter by status (vacant/occupied)
+    // Filter by status (available/occupied/maintenance)
     if (status) {
-      if (status.toLowerCase() === 'vacant') {
-        query = query.is('tenant_id', true);
-      } else if (status.toLowerCase() === 'occupied') {
-        query = query.not('tenant_id', 'is', null);
+      const statusLower = status.toLowerCase();
+      const normalizedStatus = statusLower === 'vacant' ? 'available' : statusLower;
+      const validStatuses = ['available', 'occupied', 'maintenance'];
+
+      if (validStatuses.includes(normalizedStatus)) {
+        query = query.eq('status', normalizedStatus);
       }
     }
 
@@ -166,12 +168,14 @@ router.post('/', requireAuth, rbac('admin'), async (req, res) => {
       });
     }
 
-    // Validate status is either 'vacant' or 'occupied'
-    const validStatuses = ['vacant', 'occupied'];
-    if (!validStatuses.includes(status.toLowerCase())) {
+    // Validate status is either 'available', 'occupied', or 'maintenance'
+    const statusLower = status.toLowerCase();
+    const normalizedStatus = statusLower === 'vacant' ? 'available' : statusLower;
+    const validStatuses = ['available', 'occupied', 'maintenance'];
+    if (!validStatuses.includes(normalizedStatus)) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Status must be either "vacant" or "occupied"'
+        message: 'Status must be one of: available, occupied, or maintenance'
       });
     }
 
@@ -185,7 +189,7 @@ router.post('/', requireAuth, rbac('admin'), async (req, res) => {
         name: sanitizedName,
         address: sanitizedAddress,
         rent: parseFloat(rent),
-        status: status.toLowerCase(),
+        status: normalizedStatus,
         tenant_id: null
       }])
       .select()
@@ -228,14 +232,16 @@ router.put('/:id', requireAuth, rbac('admin'), async (req, res) => {
       updateData.rent = parseFloat(rent);
     }
     if (status) {
-      const validStatuses = ['vacant', 'occupied'];
-      if (!validStatuses.includes(status.toLowerCase())) {
+      const statusLower = status.toLowerCase();
+      const normalizedStatus = statusLower === 'vacant' ? 'available' : statusLower;
+      const validStatuses = ['available', 'occupied', 'maintenance'];
+      if (!validStatuses.includes(normalizedStatus)) {
         return res.status(400).json({ 
           success: false, 
-          message: 'Status must be either "vacant" or "occupied"'
+          message: 'Status must be one of: available, occupied, or maintenance'
         });
       }
-      updateData.status = status.toLowerCase();
+      updateData.status = normalizedStatus;
     }
     if (tenant_id !== undefined) updateData.tenant_id = tenant_id;
 

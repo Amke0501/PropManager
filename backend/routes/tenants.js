@@ -13,7 +13,7 @@ router.get('/', requireAuth, rbac('admin'), async (req, res) => {
     let query = supabase
       .from('users')
       .select('*')
-      .eq('role', 'tenant');
+      .in('role', ['tenant', 'user']);
 
     // Apply search filter
     if (search) {
@@ -55,7 +55,7 @@ router.get('/:id', requireAuth, rbac('admin'), async (req, res) => {
       .from('users')
       .select('*')
       .eq('id', req.params.id)
-      .eq('role', 'tenant')
+      .in('role', ['tenant', 'user'])
       .single();
 
     if (error) throw error;

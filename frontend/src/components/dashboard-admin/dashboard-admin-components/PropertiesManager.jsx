@@ -1,13 +1,6 @@
-import { useState, useEffect } from "react";
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  X,
-  Upload,
-  Image as ImageIcon,
-} from "lucide-react";
-import { propertiesAPI } from "../../../services/api";
+import { useState, useEffect } from 'react';
+import { Plus, Pencil, Trash2, X } from 'lucide-react';
+import { propertiesAPI } from '../../../Services/api';
 
 export const PropertiesManager = () => {
   const [properties, setProperties] = useState([]);
@@ -77,44 +70,89 @@ export const PropertiesManager = () => {
         await propertiesAPI.delete(id);
         alert("Property deleted successfully!");
         fetchProperties();
-      } catch (error) {
-        console.error("Error deleting property:", error);
-        alert(`Failed to delete property: ${error.message}`);
-      }
-    }
-  };
+    }, []);
 
-  const handleEdit = (property) => {
-    setEditingProperty(property);
-    setFormData({
-      name: property.name,
-      address: property.address,
-      rent: property.rent,
-      status: property.status,
-      description: property.description || "",
-    });
-    setImageUrls([property.images?.[0] || "", property.images?.[1] || ""]);
-    setShowModal(true);
-  };
+    const fetchProperties = async () => {
+        try {
+            const data = await propertiesAPI.getAll();
+            setProperties(data?.data ?? data ?? []);
+        } catch (error) {
+            console.error('Error fetching properties:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setEditingProperty(null);
-    setFormData({
-      name: "",
-      address: "",
-      rent: "",
-      status: "available",
-      description: "",
-    });
-    setImageUrls(["", ""]);
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log('Form submitted with data:', formData);
+        try {
+            if (editingProperty) {
+                console.log('Updating property:', editingProperty.id);
+                await propertiesAPI.update(editingProperty.id, formData);
+            } else {
+                console.log('Creating new property');
+                const result = await propertiesAPI.create(formData);
+                console.log('Property created:', result);
+            }
+            fetchProperties();
+            handleCloseModal();
+        } catch (error) {
+            console.error('Error saving property:', error);
+            alert(`Error: ${error.message}`);
+        }
+    };
 
-  const handleImageUrlChange = (index, value) => {
-    const newUrls = [...imageUrls];
-    newUrls[index] = value;
-    setImageUrls(newUrls);
-  };
+    const handleDelete = async (id) => {
+        if (window.confirm('Are you sure you want to delete this property?')) {
+            try {
+                await propertiesAPI.delete(id);
+                fetchProperties();
+            } catch (error) {
+                console.error('Error deleting property:', error);
+            }
+        }
+    };
+
+    const handleEdit = (property) => {
+        setEditingProperty(property);
+        setFormData({
+            name: property.name,
+            address: property.address,
+            rent: property.rent,
+            status: property.status
+        });
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setEditingProperty(null);
+        setFormData({
+            name: '',
+            address: '',
+            rent: '',
+            status: 'available'
+        });
+    };
+
+    if (loading) return <div>Loading...</div>;
+
+    return (
+        <div className="mt-6">
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">Properties</h2>
+                <button
+                    onClick={() => {
+                        console.log('Add Property button clicked');
+                        setShowModal(true);
+                    }}
+                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                    <Plus size={20} />
+                    Add Property
+                </button>
+            </div>
 
   if (loading)
     return <div className="text-center py-8">Loading properties...</div>;
