@@ -182,11 +182,16 @@ export const UpcomingActivity = () => {
                 event.date.getFullYear() === date.getFullYear()
         );
     };
+    return colors[type] || "bg-gray-100 text-gray-800 border-gray-200";
+  };
 
-    const getEventsForSelectedDate = () => {
-        if (!selectedDate) return [];
-        return getEventsForDate(selectedDate);
-    };
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
 
     const upcomingEvents = events.filter((event) => event.status !== 'completed');
     const pastEvents = events.filter((event) => event.status === 'completed');
@@ -196,19 +201,70 @@ export const UpcomingActivity = () => {
         "July", "August", "September", "October", "November", "December"
     ];
 
-    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentDate);
 
-    const isToday = (day) => {
-        const today = new Date();
-        return (
-            day === today.getDate() &&
-            currentDate.getMonth() === today.getMonth() &&
-            currentDate.getFullYear() === today.getFullYear()
-        );
-    };
+  const prevMonth = () => {
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1),
+    );
+  };
 
-    if (loading) return <div>Loading events...</div>;
+  const nextMonth = () => {
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1),
+    );
+  };
 
+  const getEventsForDate = (day) => {
+    const date = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      day,
+    );
+    return events.filter(
+      (event) =>
+        event.date.getDate() === date.getDate() &&
+        event.date.getMonth() === date.getMonth() &&
+        event.date.getFullYear() === date.getFullYear(),
+    );
+  };
+
+  const getEventsForSelectedDate = () => {
+    if (!selectedDate) return [];
+    return getEventsForDate(selectedDate);
+  };
+
+  const handleDateClick = (day) => {
+    setSelectedDate(day);
+    // Show overlay only on medium and lower devices
+    if (window.innerWidth < 1024) {
+      setShowEventsOverlay(true);
+    }
+  };
+
+  const handleBackToCalendar = () => {
+    setShowEventsOverlay(false);
+  };
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  const isToday = (day) => {
+    const today = new Date();
     return (
         <div className="mt-6">
             <div className="w-full border-2 transition-all duration-200 hover:shadow-lg border-gray-200 bg-white rounded-2xl px-4 py-4 flex flex-col lg:flex-row gap-4 relative">
@@ -275,35 +331,35 @@ export const UpcomingActivity = () => {
                     ${isTodayDate ? "bg-blue-50 font-bold text-blue-600" : "text-gray-700"}
                     ${isSelected ? "ring-2 ring-blue-500 bg-blue-50" : "hover:bg-gray-100"}
                   `}
-                                >
-                                    <div className="flex flex-col items-center justify-center h-full">
-                                        <span>{day}</span>
-                                        {hasEvents && (
-                                            <div className="flex gap-0.5 mt-1">
-                                                {dayEvents.slice(0, 3).map((event, i) => (
-                                                    <div
-                                                        key={i}
-                                                        className={`w-1 h-1 rounded-full ${
-                                                            event.type === "inspection"
-                                                                ? "bg-blue-500"
-                                                                : event.type === "lease"
-                                                                    ? "bg-green-500"
-                                                                    : event.type === "maintenance"
-                                                                        ? "bg-orange-500"
-                                                                        : event.type === "meeting"
-                                                                            ? "bg-purple-500"
-                                                                            : "bg-emerald-500"
-                                                        }`}
-                                                    />
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
+                >
+                  <div className="flex flex-col items-center justify-center h-full">
+                    <span>{day}</span>
+                    {hasEvents && (
+                      <div className="flex gap-0.5 mt-1">
+                        {dayEvents.slice(0, 3).map((event, i) => (
+                          <div
+                            key={i}
+                            className={`w-1 h-1 rounded-full ${
+                              event.type === "inspection"
+                                ? "bg-blue-500"
+                                : event.type === "lease"
+                                  ? "bg-green-500"
+                                  : event.type === "maintenance"
+                                    ? "bg-orange-500"
+                                    : event.type === "meeting"
+                                      ? "bg-purple-500"
+                                      : "bg-emerald-500"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
                 {/* Events Sidebar */}
                 <div className="w-full lg:w-64 border-t lg:border-t-0 lg:border-l border-gray-200 pt-4 lg:pt-3 lg:pl-4 flex flex-col relative z-10 pointer-events-auto">
@@ -394,8 +450,8 @@ export const UpcomingActivity = () => {
                                     <Clock className="size-3" />
                                     <span>
                     {event.date.toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
+                      month: "short",
+                      day: "numeric",
                     })}
                   </span>
                                     <span className="ml-auto">{event.time}</span>
@@ -445,117 +501,128 @@ export const UpcomingActivity = () => {
                         )}
                     </div>
                 </div>
+              </div>
+            ))}
+
+            {selectedDate && getEventsForSelectedDate().length === 0 && (
+              <div className="text-center py-8 text-gray-400">
+                <Clock className="size-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No events scheduled</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">
+                {editingEvent ? "Edit Event" : "Add New Event"}
+              </h3>
+              <button
+                onClick={handleCloseModal}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
             </div>
 
-            {/* Modal */}
-            {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-bold">
-                                {editingEvent ? 'Edit Event' : 'Add New Event'}
-                            </h3>
-                            <button
-                                onClick={handleCloseModal}
-                                className="text-gray-500 hover:text-gray-700"
-                            >
-                                <X size={24} />
-                            </button>
-                        </div>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Event Title
+                </label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  required
+                />
+              </div>
 
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">
-                                    Event Title
-                                </label>
-                                <input
-                                    type="text"
-                                    value={formData.title}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, title: e.target.value })
-                                    }
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
-                                    required
-                                />
-                            </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Property
+                </label>
+                <input
+                  type="text"
+                  value={formData.property}
+                  onChange={(e) =>
+                    setFormData({ ...formData, property: e.target.value })
+                  }
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  required
+                />
+              </div>
 
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">
-                                    Property
-                                </label>
-                                <input
-                                    type="text"
-                                    value={formData.property}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, property: e.target.value })
-                                    }
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
-                                    required
-                                />
-                            </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Type</label>
+                <select
+                  value={formData.type}
+                  onChange={(e) =>
+                    setFormData({ ...formData, type: e.target.value })
+                  }
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                  <option value="inspection">Inspection</option>
+                  <option value="lease">Lease Signing</option>
+                  <option value="maintenance">Maintenance</option>
+                  <option value="meeting">Meeting</option>
+                  <option value="payment">Payment</option>
+                </select>
+              </div>
 
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">Type</label>
-                                <select
-                                    value={formData.type}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, type: e.target.value })
-                                    }
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
-                                >
-                                    <option value="inspection">Inspection</option>
-                                    <option value="lease">Lease Signing</option>
-                                    <option value="maintenance">Maintenance</option>
-                                    <option value="meeting">Meeting</option>
-                                    <option value="payment">Payment</option>
-                                </select>
-                            </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Date</label>
+                <input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) =>
+                    setFormData({ ...formData, date: e.target.value })
+                  }
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  required
+                />
+              </div>
 
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">Date</label>
-                                <input
-                                    type="date"
-                                    value={formData.date}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, date: e.target.value })
-                                    }
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
-                                    required
-                                />
-                            </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Time</label>
+                <input
+                  type="time"
+                  value={formData.time}
+                  onChange={(e) =>
+                    setFormData({ ...formData, time: e.target.value })
+                  }
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  required
+                />
+              </div>
 
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">Time</label>
-                                <input
-                                    type="time"
-                                    value={formData.time}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, time: e.target.value })
-                                    }
-                                    className="w-full border border-gray-300 rounded px-3 py-2"
-                                    required
-                                />
-                            </div>
-
-                            <div className="flex gap-2">
-                                <button
-                                    type="button"
-                                    onClick={handleCloseModal}
-                                    className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-                                >
-                                    {editingEvent ? 'Update' : 'Create'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                >
+                  {editingEvent ? "Update" : "Create"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-    );
+      )}
+    </div>
+  );
 };
