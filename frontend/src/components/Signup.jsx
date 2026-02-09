@@ -39,7 +39,7 @@ export function Signup() {
     try {
       // BACKEND API CALL: POST to /api/auth/signup
       // This sends user data to the backend server running on Render
-      const response = await fetch('https://propmanager-9f7y.onrender.com/api/auth/signup', {
+      const response = await fetch('https://propmanager-1.onrender.com/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
