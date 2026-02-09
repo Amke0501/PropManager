@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://propmanager-backend.onrender.com/api';
 
 // Get auth token from localStorage
 const getAuthToken = () => {
