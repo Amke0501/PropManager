@@ -57,29 +57,12 @@ router.get('/', requireAuth, async (req, res) => {
 
     if (error) throw error;
 
-    // If not admin, filter by tenant_id
-    let filteredData = data;
-    if (req.user.role !== 'admin') {
-      const { data: userProfile } = await supabase
-        .from('users')
-        .select('id')
-        .eq('id', req.user.id)
-        .single();
-
-      if (!userProfile) {
-        return res.status(404).json({ 
-          success: false, 
-          message: 'User profile not found' 
-        });
-      }
-
-      filteredData = data.filter(p => p.tenant_id === userProfile.id);
-    }
-
+    // Return all properties for dropdown (no filtering by tenant_id)
+    // This allows users to submit notices/requests for any property
     res.json({
       success: true,
-      count: filteredData.length,
-      data: filteredData
+      count: data.length,
+      data: data
     });
   } catch (error) {
     console.error('Get properties error:', error);
