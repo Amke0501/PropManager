@@ -182,16 +182,11 @@ export const UpcomingActivity = () => {
                 event.date.getFullYear() === date.getFullYear()
         );
     };
-    return colors[type] || "bg-gray-100 text-gray-800 border-gray-200";
-  };
 
-  const getDaysInMonth = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
+    const getEventsForSelectedDate = () => {
+        if (!selectedDate) return [];
+        return getEventsForDate(selectedDate);
+    };
 
     const upcomingEvents = events.filter((event) => event.status !== 'completed');
     const pastEvents = events.filter((event) => event.status === 'completed');
@@ -201,70 +196,19 @@ export const UpcomingActivity = () => {
         "July", "August", "September", "October", "November", "December"
     ];
 
-  const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentDate);
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  const prevMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1),
-    );
-  };
+    const isToday = (day) => {
+        const today = new Date();
+        return (
+            today.getDate() === day &&
+            today.getMonth() === currentDate.getMonth() &&
+            today.getFullYear() === currentDate.getFullYear()
+        );
+    };
 
-  const nextMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1),
-    );
-  };
+    if (loading) return <div>Loading events...</div>;
 
-  const getEventsForDate = (day) => {
-    const date = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      day,
-    );
-    return events.filter(
-      (event) =>
-        event.date.getDate() === date.getDate() &&
-        event.date.getMonth() === date.getMonth() &&
-        event.date.getFullYear() === date.getFullYear(),
-    );
-  };
-
-  const getEventsForSelectedDate = () => {
-    if (!selectedDate) return [];
-    return getEventsForDate(selectedDate);
-  };
-
-  const handleDateClick = (day) => {
-    setSelectedDate(day);
-    // Show overlay only on medium and lower devices
-    if (window.innerWidth < 1024) {
-      setShowEventsOverlay(true);
-    }
-  };
-
-  const handleBackToCalendar = () => {
-    setShowEventsOverlay(false);
-  };
-
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-  const isToday = (day) => {
-    const today = new Date();
     return (
         <div className="mt-6">
             <div className="w-full border-2 transition-all duration-200 hover:shadow-lg border-gray-200 bg-white rounded-2xl px-4 py-4 flex flex-col lg:flex-row gap-4 relative">
@@ -501,18 +445,7 @@ export const UpcomingActivity = () => {
                         )}
                     </div>
                 </div>
-              </div>
-            ))}
-
-            {selectedDate && getEventsForSelectedDate().length === 0 && (
-              <div className="text-center py-8 text-gray-400">
-                <Clock className="size-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No events scheduled</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+            </div>
 
       {/* Modal */}
       {showModal && (

@@ -7,7 +7,6 @@ export const PropertiesManager = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProperty, setEditingProperty] = useState(null);
-  const [imageUrls, setImageUrls] = useState(["", ""]);
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -23,11 +22,9 @@ export const PropertiesManager = () => {
   const fetchProperties = async () => {
     try {
       const data = await propertiesAPI.getAll();
-      console.log("Fetched properties:", data);
-      setProperties(data);
+      setProperties(data?.data ?? data ?? []);
     } catch (error) {
-      console.error("Error fetching properties:", error);
-      alert(`Failed to load properties: ${error.message}`);
+      console.error('Error fetching properties:', error);
     } finally {
       setLoading(false);
     }
@@ -35,127 +32,56 @@ export const PropertiesManager = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log("Submitting property:", formData);
-    console.log("Image URLs:", imageUrls);
-
     try {
-      // Filter out empty image URLs
-      const validImages = imageUrls.filter((url) => url.trim() !== "");
-
-      const propertyData = {
-        ...formData,
-        images: validImages,
-      };
-
       if (editingProperty) {
-        await propertiesAPI.update(editingProperty.id, propertyData);
-        alert("Property updated successfully!");
+        await propertiesAPI.update(editingProperty.id, formData);
       } else {
-        await propertiesAPI.create(propertyData);
-        alert("Property created successfully!");
+        await propertiesAPI.create(formData);
       }
-
       fetchProperties();
       handleCloseModal();
     } catch (error) {
-      console.error("Error saving property:", error);
-      alert(`Failed to save property: ${error.message}`);
+      console.error('Error saving property:', error);
+      alert(`Error: ${error.message}`);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this property?")) {
+    if (window.confirm('Are you sure you want to delete this property?')) {
       try {
         await propertiesAPI.delete(id);
-        alert("Property deleted successfully!");
         fetchProperties();
-    }, []);
+      } catch (error) {
+        console.error('Error deleting property:', error);
+      }
+    }
+  };
 
-    const fetchProperties = async () => {
-        try {
-            const data = await propertiesAPI.getAll();
-            setProperties(data?.data ?? data ?? []);
-        } catch (error) {
-            console.error('Error fetching properties:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleEdit = (property) => {
+    setEditingProperty(property);
+    setFormData({
+      name: property.name,
+      address: property.address,
+      rent: property.rent,
+      status: property.status,
+      description: property.description || ""
+    });
+    setShowModal(true);
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log('Form submitted with data:', formData);
-        try {
-            if (editingProperty) {
-                console.log('Updating property:', editingProperty.id);
-                await propertiesAPI.update(editingProperty.id, formData);
-            } else {
-                console.log('Creating new property');
-                const result = await propertiesAPI.create(formData);
-                console.log('Property created:', result);
-            }
-            fetchProperties();
-            handleCloseModal();
-        } catch (error) {
-            console.error('Error saving property:', error);
-            alert(`Error: ${error.message}`);
-        }
-    };
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditingProperty(null);
+    setFormData({
+      name: '',
+      address: '',
+      rent: '',
+      status: 'available',
+      description: ''
+    });
+  };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this property?')) {
-            try {
-                await propertiesAPI.delete(id);
-                fetchProperties();
-            } catch (error) {
-                console.error('Error deleting property:', error);
-            }
-        }
-    };
-
-    const handleEdit = (property) => {
-        setEditingProperty(property);
-        setFormData({
-            name: property.name,
-            address: property.address,
-            rent: property.rent,
-            status: property.status
-        });
-        setShowModal(true);
-    };
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-        setEditingProperty(null);
-        setFormData({
-            name: '',
-            address: '',
-            rent: '',
-            status: 'available'
-        });
-    };
-
-    if (loading) return <div>Loading...</div>;
-
-    return (
-        <div className="mt-6">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">Properties</h2>
-                <button
-                    onClick={() => {
-                        console.log('Add Property button clicked');
-                        setShowModal(true);
-                    }}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                    <Plus size={20} />
-                    Add Property
-                </button>
-            </div>
-
-  if (loading)
-    return <div className="text-center py-8">Loading properties...</div>;
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="mt-6">
@@ -170,11 +96,10 @@ export const PropertiesManager = () => {
         </button>
       </div>
 
+
       {properties.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <p className="text-gray-500 mb-4">
-            No properties yet. Add your first property!
-          </p>
+          <p className="text-gray-500 mb-4">No properties yet. Add your first property!</p>
           <button
             onClick={() => setShowModal(true)}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -189,43 +114,19 @@ export const PropertiesManager = () => {
               key={property.id}
               className="bg-white rounded-lg border-2 border-gray-200 hover:shadow-lg transition-shadow overflow-hidden"
             >
-              {/* Property Images */}
-              {property.images && property.images.length > 0 ? (
-                <div className="relative h-48 bg-gray-200">
-                  <img
-                    src={property.images[0]}
-                    alt={property.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src =
-                        "https://via.placeholder.com/400x300?text=Property+Image";
-                    }}
-                  />
-                  {property.images.length > 1 && (
-                    <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
-                      +{property.images.length - 1} more
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="h-48 bg-gray-200 flex items-center justify-center">
-                  <ImageIcon className="text-gray-400" size={48} />
-                </div>
-              )}
+              <div className="h-48 bg-gray-200 flex items-center justify-center">
+                <p className="text-gray-400">No Image</p>
+              </div>
 
-              {/* Property Details */}
               <div className="p-4">
                 <h3 className="font-bold text-lg mb-2">{property.name}</h3>
                 <p className="text-gray-600 text-sm mb-2">{property.address}</p>
                 {property.description && (
-                  <p className="text-gray-500 text-xs mb-3 line-clamp-2">
-                    {property.description}
-                  </p>
+                  <p className="text-gray-500 text-xs mb-3 line-clamp-2">{property.description}</p>
                 )}
                 <div className="flex justify-between items-center mb-3">
                   <span className="font-semibold text-green-600">
-                    R{parseFloat(property.rent).toLocaleString()}/month
+                    R{parseFloat(property.rent || 0).toLocaleString()}/month
                   </span>
                   <span
                     className={`px-2 py-1 rounded text-xs ${
@@ -279,15 +180,11 @@ export const PropertiesManager = () => {
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1">
-                    Property Name *
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Property Name *</label>
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full border border-gray-300 rounded px-3 py-2"
                     placeholder="e.g., Sunset Apartments Unit 5B"
                     required
@@ -295,15 +192,11 @@ export const PropertiesManager = () => {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1">
-                    Address *
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Address *</label>
                   <input
                     type="text"
                     value={formData.address}
-                    onChange={(e) =>
-                      setFormData({ ...formData, address: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     className="w-full border border-gray-300 rounded px-3 py-2"
                     placeholder="e.g., 123 Main Street, Cape Town"
                     required
@@ -311,15 +204,11 @@ export const PropertiesManager = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Monthly Rent (R) *
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Monthly Rent (R) *</label>
                   <input
                     type="number"
                     value={formData.rent}
-                    onChange={(e) =>
-                      setFormData({ ...formData, rent: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, rent: e.target.value })}
                     className="w-full border border-gray-300 rounded px-3 py-2"
                     placeholder="5000"
                     required
@@ -327,14 +216,10 @@ export const PropertiesManager = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Status
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Status</label>
                   <select
                     value={formData.status}
-                    onChange={(e) =>
-                      setFormData({ ...formData, status: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                     className="w-full border border-gray-300 rounded px-3 py-2"
                   >
                     <option value="available">Available</option>
@@ -344,54 +229,13 @@ export const PropertiesManager = () => {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1">
-                    Description
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Description</label>
                   <textarea
                     value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="w-full border border-gray-300 rounded px-3 py-2 h-20"
                     placeholder="Brief description of the property..."
                   />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">
-                    <Upload size={16} className="inline mr-1" />
-                    Property Images (URLs)
-                  </label>
-                  <div className="space-y-3">
-                    {[0, 1].map((index) => (
-                      <div key={index}>
-                        <input
-                          type="url"
-                          value={imageUrls[index]}
-                          onChange={(e) =>
-                            handleImageUrlChange(index, e.target.value)
-                          }
-                          className="w-full border border-gray-300 rounded px-3 py-2"
-                          placeholder={`Image ${index + 1} URL (e.g., https://example.com/image.jpg)`}
-                        />
-                        {imageUrls[index] && (
-                          <div className="mt-2">
-                            <img
-                              src={imageUrls[index]}
-                              alt={`Preview ${index + 1}`}
-                              className="h-24 w-32 object-cover rounded border"
-                              onError={(e) => {
-                                e.target.style.display = "none";
-                              }}
-                              onLoad={(e) => {
-                                e.target.style.display = "block";
-                              }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
 

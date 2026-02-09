@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Home, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home, Clock, ArrowLeft } from "lucide-react";
 import { eventsAPI } from "../../../Services/api";
 
 export const UpcomingActivity = () => {
@@ -8,6 +8,7 @@ export const UpcomingActivity = () => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('upcoming');
+    const [showEventsOverlay, setShowEventsOverlay] = useState(false);
 
     useEffect(() => {
         fetchEvents();
@@ -86,66 +87,37 @@ export const UpcomingActivity = () => {
     return getEventsForDate(selectedDate);
   };
 
-    const upcomingEvents = events.filter((event) => event.status !== 'completed');
-    const pastEvents = events.filter((event) => event.status === 'completed');
+  const upcomingEvents = events.filter((event) => event.status !== 'completed');
+  const pastEvents = events.filter((event) => event.status === 'completed');
 
-    const monthNames = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ];
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const handleBackToCalendar = () => {
     setShowEventsOverlay(false);
   };
 
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const handleDateClick = (day) => {
+    setSelectedDate(day);
+    setShowEventsOverlay(true);
+  };
 
   const isToday = (day) => {
     const today = new Date();
     return (
-        <div className="mt-6 sm:mt-10">
-            <div className="w-full border-2 transition-all duration-200 hover:shadow-lg border-gray-200 bg-white rounded-2xl px-4 py-4 flex flex-col lg:flex-row gap-4">
-                {/* Calendar Section */}
-                <div className="flex-1 flex flex-col">
-                    {/* Calendar Header */}
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-semibold text-gray-900">
-                            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-                        </h2>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={prevMonth}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            >
-                                <ChevronLeft className="size-5" />
-                            </button>
-                            <button
-                                onClick={nextMonth}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            >
-                                <ChevronRight className="size-5" />
-                            </button>
-                        </div>
-                    </div>
+      today.getDate() === day &&
+      today.getMonth() === currentDate.getMonth() &&
+      today.getFullYear() === currentDate.getFullYear()
+    );
+  };
 
-  if (loading) return <div>Loading events...</div>;
+    if (loading) return <div>Loading events...</div>;
 
-  return (
+    return (
     <div className="mt-16">
       <div className="calender-wrap aspect-video border-2 transition-all duration-200 hover:shadow-lg border-gray-200 bg-white rounded-2xl px-4 py-1 flex gap-4 relative">
         {/* Calendar Section - Hidden on mobile when overlay is shown */}
@@ -239,12 +211,8 @@ export const UpcomingActivity = () => {
         {/* Events Sidebar*/}
         <div
           className={`
-            flex-1 border-gray-200 lg:border-l lg:pl-4 flex flex-col pt-3
-            ${
-              showEventsOverlay
-                ? ""
-                : "hidden show-side-event"
-            }
+            flex-1 border-gray border-gray-200 lg:border-l lg:pl-4 flex flex-col pt-3
+            ${showEventsOverlay ? "" : "hidden lg:flex"}
           `}
         >
           {/* Back button - Only visible on mobile when overlay is shown */}
@@ -258,119 +226,101 @@ export const UpcomingActivity = () => {
             </button>
           )}
 
-                {/* Events Sidebar */}
-                <div className="w-full lg:w-64 border-t lg:border-t-0 lg:border-l border-gray-200 pt-4 lg:pt-3 lg:pl-4 flex flex-col">
-                    <div className="mb-4">
-                        <h3 className="text-sm font-semibold text-gray-900 mb-1">
-                            {selectedDate
-                                ? `Events for ${monthNames[currentDate.getMonth()]} ${selectedDate}`
-                                : activeTab === 'past' ? "Past Events" : "Your Appointments"}
-                        </h3>
-                        <p className="text-xs text-gray-500">
-                            {selectedDate
-                                ? getEventsForSelectedDate().length
-                                : activeTab === 'past'
-                                    ? pastEvents.length
-                                    : upcomingEvents.length}{" "}
-                            event(s)
-                        </p>
-                        {!selectedDate && (
-                            <div className="mt-2 flex gap-2 text-xs">
-                                <button
-                                    type="button"
-                                    onClick={() => setActiveTab('upcoming')}
-                                    className={`px-2 py-1 rounded ${
-                                        activeTab === 'upcoming'
-                                            ? 'bg-blue-100 text-blue-700'
-                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                    }`}
-                                >
-                                    Upcoming
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setActiveTab('past')}
-                                    className={`px-2 py-1 rounded ${
-                                        activeTab === 'past'
-                                            ? 'bg-blue-100 text-blue-700'
-                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                    }`}
-                                >
-                                    Past
-                                </button>
-                            </div>
-                        )}
-                    </div>
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">
+              {selectedDate
+                ? `Events for ${monthNames[currentDate.getMonth()]} ${selectedDate}`
+                : activeTab === 'past' ? "Past Events" : "Your Appointments"}
+            </h3>
+            <p className="text-xs text-gray-500">
+              {selectedDate
+                ? getEventsForSelectedDate().length
+                : activeTab === 'past'
+                  ? pastEvents.length
+                  : upcomingEvents.length}{" "}
+              event(s)
+            </p>
+            {!selectedDate && (
+              <div className="mt-2 flex gap-2 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('upcoming')}
+                  className={`px-2 py-1 rounded ${
+                    activeTab === 'upcoming'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  Upcoming
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('past')}
+                  className={`px-2 py-1 rounded ${
+                    activeTab === 'past'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  Past
+                </button>
+              </div>
+            )}
+          </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-3">
-                        {(selectedDate
-                            ? getEventsForSelectedDate()
-                            : (activeTab === 'past' ? pastEvents : upcomingEvents).slice(0, 5)
-                        ).map((event) => (
-                            <div
-                                key={event.id}
-                                className={`p-3 rounded-lg border ${getEventTypeColor(event.type)} transition-all hover:shadow-md`}
-                            >
-                                <div className="flex items-start gap-2 mb-2">
-                                    <Home className="size-4 mt-0.5 shrink-0" />
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="font-semibold text-sm truncate">
-                                            {event.title}
-                                        </h4>
-                                        <p className="text-xs truncate opacity-80">
-                                            {event.property}
-                                        </p>
-                                        {event.description && (
-                                            <p className="text-xs mt-1 opacity-70">
-                                                {event.description}
-                                            </p>
-                                        )}
-                                        {event.status && (
-                                            <p className="text-xs mt-1 font-medium">
-                                                Status: {event.status === 'completed' ? 'closed' : event.status}
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2 text-xs">
-                                    <Clock className="size-3" />
-                                    <span>
+          <div className="flex-1 overflow-y-auto space-y-3">
+            {(selectedDate
+              ? getEventsForSelectedDate()
+              : (activeTab === 'past' ? pastEvents : upcomingEvents).slice(0, 5)
+            ).map((event) => (
+              <div
+                key={event.id}
+                className={`p-3 rounded-lg border ${getEventTypeColor(event.type)} transition-all hover:shadow-md`}
+              >
+                <div className="flex items-start gap-2 mb-2">
+                  <Home className="size-4 mt-0.5 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm truncate">
+                      {event.title}
+                    </h4>
+                    <p className="text-xs truncate opacity-80">
+                      {event.property}
+                    </p>
+                    {event.description && (
+                      <p className="text-xs mt-1 opacity-70">
+                        {event.description}
+                      </p>
+                    )}
+                    {event.status && (
+                      <p className="text-xs mt-1 font-medium">
+                        Status: {event.status === 'completed' ? 'closed' : event.status}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <Clock className="size-3" />
+                  <span>
                     {event.date.toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
                     })}
                   </span>
-                                    <span className="ml-auto">{event.time}</span>
-                                </div>
-                                {event.status === 'pending' && (
-                                    <div className="mt-2 text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">
-                                        Pending Admin Review
-                                    </div>
-                                )}
-                                {event.status === 'confirmed' && (
-                                    <div className="mt-2 text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded">
-                                        Confirmed by Admin
-                                    </div>
-                                )}
-                                {event.status === 'completed' && (
-                                    <div className="mt-2 text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                                        Closed
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-
-                        {selectedDate && getEventsForSelectedDate().length === 0 && (
-                            <div className="text-center py-8 text-gray-400">
-                                <Clock className="size-8 mx-auto mb-2 opacity-50" />
-                                <p className="text-sm">No events scheduled</p>
-                            </div>
-                        )}
-                    </div>
+                  <span className="ml-auto">{event.time}</span>
                 </div>
-                {event.created_by === "tenant" && (
+                {event.status === 'pending' && (
                   <div className="mt-2 text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">
-                    Your Request - Pending Admin Review
+                    Pending Admin Review
+                  </div>
+                )}
+                {event.status === 'confirmed' && (
+                  <div className="mt-2 text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded">
+                    Confirmed by Admin
+                  </div>
+                )}
+                {event.status === 'completed' && (
+                  <div className="mt-2 text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                    Closed
                   </div>
                 )}
               </div>
@@ -386,5 +336,5 @@ export const UpcomingActivity = () => {
         </div>
       </div>
     </div>
-  );
+    );
 };

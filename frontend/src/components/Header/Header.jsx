@@ -1,9 +1,11 @@
 import {Folder, House, HouseHeart, LogOut, MessageCircle, UserRound} from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 
 export const Header = () => {
     const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
 
     const handleLogout = () => {
         // Clear authentication token from localStorage
