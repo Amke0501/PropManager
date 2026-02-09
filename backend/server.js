@@ -72,6 +72,29 @@ app.get('/api', (req, res) => {
     res.json({ message: 'PropManager API is running' });
 });
 
+// TEST: Get properties without auth
+app.get('/api/test/properties', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('properties').select('*');
+    
+    if (error) throw error;
+    
+    res.json({
+      success: true,
+      count: data.length,
+      message: `Found ${data.length} properties in database`,
+      data: data
+    });
+  } catch (error) {
+    console.error('Test properties error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching test properties',
+      error: error.message
+    });
+  }
+});
+
 // Starts the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
