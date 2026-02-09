@@ -26,16 +26,25 @@ export const Options = () => {
     const fetchProperties = async () => {
         setPropertiesLoading(true);
         try {
+            const authToken = localStorage.getItem('authToken');
+            console.log('Auth token available:', !!authToken);
+            
             const response = await propertiesAPI.getAll();
             console.log('Properties API response:', response); // Debug log
+            console.log('Response status:', response);
+            
             const data = response?.data ?? response ?? [];
             console.log('Parsed properties data:', data); // Debug log
+            console.log('Number of properties:', data.length);
+            
             setProperties(data);
             if (data.length === 0) {
-                console.warn('No properties returned. User may not have assigned properties.');
+                console.warn('No properties returned. Checking if auth or API issue...');
             }
         } catch (error) {
             console.error('Error fetching properties:', error);
+            console.error('Error message:', error.message);
+            console.error('Error stack:', error.stack);
             setProperties([]);
         } finally {
             setPropertiesLoading(false);
