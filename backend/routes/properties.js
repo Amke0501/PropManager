@@ -8,9 +8,16 @@ const { validatePositiveNumber, validateRequiredFields, sanitizeString } = requi
 // TEST ENDPOINT - Get all properties without auth (for debugging)
 router.get('/test/all-properties', async (req, res) => {
   try {
+    console.log('🧪 Test endpoint called: /test/all-properties');
+    
     const { data, error } = await supabase.from('properties').select('*');
     
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Test endpoint error:', error.message);
+      throw error;
+    }
+    
+    console.log(`✅ Test endpoint - Found ${data.length} properties`);
     
     res.json({
       success: true,
@@ -19,7 +26,7 @@ router.get('/test/all-properties', async (req, res) => {
       data: data
     });
   } catch (error) {
-    console.error('Test properties error:', error);
+    console.error('❌ Test properties error:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching properties from test endpoint',
@@ -31,6 +38,10 @@ router.get('/test/all-properties', async (req, res) => {
 // GET /api/properties - Admin sees all, tenants see their assigned properties
 router.get('/', requireAuth, async (req, res) => {
   try {
+    console.log('📍 Properties endpoint called');
+    console.log('   User ID:', req.user?.id);
+    console.log('   User Role:', req.user?.role);
+    
     const { status, minRent, maxRent, bedrooms, bathrooms } = req.query;
 
     let query = supabase.from('properties').select('*');
@@ -78,8 +89,13 @@ router.get('/', requireAuth, async (req, res) => {
 
     const { data, error } = await query;
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Database error:', error.message);
+      throw error;
+    }
 
+    console.log(`✅ Properties query successful - Found ${data.length} properties`);
+    
     // Return all properties for dropdown (no filtering by tenant_id)
     // This allows users to submit notices/requests for any property
     res.json({
@@ -88,7 +104,7 @@ router.get('/', requireAuth, async (req, res) => {
       data: data
     });
   } catch (error) {
-    console.error('Get properties error:', error);
+    console.error('❌ Get properties error:', error.message);
     res.status(500).json({ 
       success: false,
       message: 'Error fetching properties',
