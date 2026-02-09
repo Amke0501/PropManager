@@ -10,6 +10,34 @@ const supabaseAnon = createClient(
   process.env.SUPABASE_ANON_KEY
 );
 
+// DEBUG: Test properties endpoint
+router.get('/test-properties', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('properties').select('*');
+    
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error fetching properties',
+        error: error.message
+      });
+    }
+    
+    res.json({
+      success: true,
+      count: data.length,
+      message: `Found ${data.length} properties in database`,
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+});
+
 // POST /api/auth/signup - Register new user with Supabase
 router.post('/signup', async (req, res) => {
   try {
