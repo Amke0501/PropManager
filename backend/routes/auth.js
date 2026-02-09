@@ -327,14 +327,12 @@ router.put('/profile', async (req, res) => {
 
     const { firstName, lastName, phone, address } = req.body;
 
-    // Update user profile in database
+    // Update user profile in database (only update existing columns)
     const { data: updatedUser, error: dbError } = await supabase
       .from('users')
       .update({
         first_name: firstName,
-        last_name: lastName,
-        phone: phone || null,
-        address: address || null
+        last_name: lastName
       })
       .eq('id', data.user.id)
       .select()
@@ -350,8 +348,6 @@ router.put('/profile', async (req, res) => {
         email: updatedUser.email,
         firstName: updatedUser.first_name,
         lastName: updatedUser.last_name,
-        phone: updatedUser.phone,
-        address: updatedUser.address,
         role: updatedUser.role
       }
     });
