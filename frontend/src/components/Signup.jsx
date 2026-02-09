@@ -38,8 +38,8 @@ export function Signup() {
 
     try {
       // BACKEND API CALL: POST to /api/auth/signup
-      // This sends user data to the backend server running on port 3000
-      const response = await fetch('http://localhost:3000/api/auth/signup', {
+      // This sends user data to the backend server running on Render
+      const response = await fetch('https://propmanager-backend.onrender.com/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -81,7 +81,7 @@ export function Signup() {
     } catch (e) {
       // NETWORK ERROR HANDLING
       // This catches: server down, network issues, CORS errors, etc.
-      setError('Unable to connect to server. Make sure backend is running on port 3000');
+      setError('Unable to connect to server. Please check your internet connection.');
     } finally {
       // Always stop loading spinner, whether success or failure
       setLoading(false)
