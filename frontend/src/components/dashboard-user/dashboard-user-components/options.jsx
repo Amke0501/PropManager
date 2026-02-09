@@ -27,8 +27,13 @@ export const Options = () => {
         setPropertiesLoading(true);
         try {
             const response = await propertiesAPI.getAll();
+            console.log('Properties API response:', response); // Debug log
             const data = response?.data ?? response ?? [];
+            console.log('Parsed properties data:', data); // Debug log
             setProperties(data);
+            if (data.length === 0) {
+                console.warn('No properties returned. User may not have assigned properties.');
+            }
         } catch (error) {
             console.error('Error fetching properties:', error);
             setProperties([]);
@@ -250,7 +255,9 @@ export const Options = () => {
                                 required
                             >
                                 <option value="">
-                                    {propertiesLoading ? 'Loading properties...' : 'Select your property'}
+                                    {propertiesLoading ? 'Loading properties...' : 
+                                     properties.length === 0 ? 'No properties assigned' : 
+                                     'Select your property'}
                                 </option>
                                 {properties.map((property) => (
                                     <option key={property.id} value={property.id}>
@@ -258,6 +265,11 @@ export const Options = () => {
                                     </option>
                                 ))}
                             </select>
+                            {properties.length === 0 && !propertiesLoading && (
+                                <p className="text-sm text-orange-600 mt-1">
+                                    No properties are currently assigned to your account. Please contact the property manager.
+                                </p>
+                            )}
                         </div>
 
                         <div className="mb-4">
@@ -363,7 +375,9 @@ export const Options = () => {
                                 required
                             >
                                 <option value="">
-                                    {propertiesLoading ? 'Loading properties...' : 'Select your property'}
+                                    {propertiesLoading ? 'Loading properties...' : 
+                                     properties.length === 0 ? 'No properties assigned' : 
+                                     'Select your property'}
                                 </option>
                                 {properties.map((property) => (
                                     <option key={property.id} value={property.id}>
@@ -371,6 +385,11 @@ export const Options = () => {
                                     </option>
                                 ))}
                             </select>
+                            {properties.length === 0 && !propertiesLoading && (
+                                <p className="text-sm text-orange-600 mt-1">
+                                    No properties are currently assigned to your account. Please contact the property manager.
+                                </p>
+                            )}
                         </div>
 
                         <div className="mb-4">
