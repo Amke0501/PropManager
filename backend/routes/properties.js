@@ -5,6 +5,29 @@ const requireAuth = require('../middleware/auth');
 const rbac = require('../middleware/rbac');
 const { validatePositiveNumber, validateRequiredFields, sanitizeString } = require('../utils/validation');
 
+// TEST ENDPOINT - Get all properties without auth (for debugging)
+router.get('/test/all-properties', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('properties').select('*');
+    
+    if (error) throw error;
+    
+    res.json({
+      success: true,
+      count: data.length,
+      message: `Found ${data.length} properties in database`,
+      data: data
+    });
+  } catch (error) {
+    console.error('Test properties error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching properties from test endpoint',
+      error: error.message
+    });
+  }
+});
+
 // GET /api/properties - Admin sees all, tenants see their assigned properties
 router.get('/', requireAuth, async (req, res) => {
   try {
