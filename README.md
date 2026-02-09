@@ -391,7 +391,7 @@ All endpoints require `Authorization: Bearer <token>` header except signup and l
 
 ---
 
-## 🧪 Testing the Application
+## Testing the Application
 
 ### Admin User Test Flow
 1. Sign up with `role: admin` option
@@ -427,21 +427,21 @@ All endpoints require `Authorization: Bearer <token>` header except signup and l
 
 ---
 
-## 🐛 Known Issues & Solutions
+## Known Issues & Solutions
 
-### ✅ RESOLVED: Property Creation Validation Error
+### RESOLVED: Property Creation Validation Error
 **Problem**: Frontend sends `status: "available"` but backend expected `"vacant"` or `"occupied"`
 **Solution**: Updated backend validation to accept `available`, `occupied`, `maintenance`
 
-### ✅ RESOLVED: Admin Dashboard Shows Zero Values
+### RESOLVED: Admin Dashboard Shows Zero Values
 **Problem**: Dashboard cards showed hardcoded 0 values instead of real data
 **Solution**: Connected components to backend APIs for real data fetching
 
-### ✅ RESOLVED: Missing API Functions
+### RESOLVED: Missing API Functions
 **Problem**: Frontend components couldn't fetch tenants, messages, or reports
 **Solution**: Added comprehensive API client in `frontend/src/Services/api.js` with all necessary endpoints
 
-### ✅ RESOLVED: Confirm and Mark Done Not Working
+### RESOLVED: Confirm and Mark Done Not Working
 **Problem**: Event action buttons had no backend endpoints
 **Solution**: Implemented `/events/:id/confirm` and `/events/:id/complete` endpoints with proper status updates
 
@@ -481,7 +481,7 @@ The system uses these Supabase tables:
 
 ---
 
-## 🚀 Deployment
+## Deployment
 
 ### Deploy Backend (Node.js)
 ```bash
@@ -510,7 +510,7 @@ const API_URL = 'https://your-production-backend.com/api';
 
 ---
 
-## 📞 Support & Contribution
+## Support & Contribution
 
 For issues, bug reports, or feature requests, please create an issue in the repository.
 
@@ -527,7 +527,7 @@ This project is licensed under the MIT License - see LICENSE file for details.
 
 ---
 
-## ✨ Changelog
+## Changelog
 
 ### Latest Updates (February 2026)
 - ✅ Implemented Confirm Event feature for admin approval of tenant notices
@@ -551,7 +551,7 @@ This project is licensed under the MIT License - see LICENSE file for details.
 
 ---
 
-## ⚙️ Setup & Installation
+##  Setup & Installation
 
 ### Prerequisites
 - **Node.js** (v18 or higher) - [Download](https://nodejs.org/)
@@ -581,7 +581,7 @@ JWT_SECRET=your_random_secret_key_123!@#
 PORT=3000
 ```
 
-> **⚠️ IMPORTANT**: 
+> ** IMPORTANT**: 
 > - Get `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` from Supabase Dashboard → Settings → API
 > - Use the **service_role** key, NOT the anon key
 > - NEVER commit `.env` to Git (it's already in `.gitignore`)
@@ -694,7 +694,7 @@ The project includes migration files in `backend/migrations/` directory. To appl
 
 ---
 
-## 🚀 Running the Application
+## Running the Application
 
 ### Option 1: Run Backend and Frontend Separately
 
@@ -703,14 +703,14 @@ The project includes migration files in `backend/migrations/` directory. To appl
 cd backend
 node server.js
 ```
-✅ Server runs on `http://localhost:3000`
+Server runs on `http://localhost:3000`
 
 **Terminal 2 - Start Frontend:**
 ```bash
 cd frontend
 npm run dev
 ```
-✅ App runs on `http://localhost:5173`
+ App runs on `http://localhost:5173`
 
 ### Option 2: For Development
 ```bash
@@ -805,7 +805,7 @@ http://localhost:3000/api
 
 ---
 
-## 🔒 Authentication & Security
+## Authentication & Security
 
 ### How Authentication Works
 1. User signs up → Account created in Supabase Auth
@@ -831,9 +831,9 @@ http://localhost:3000/api
 
 ---
 
-## ✅ Implemented Features
+##  Implemented Features
 
-### ✔️ Fully Working
+### Fully Working
 - [x] User signup and login with role selection
 - [x] Admin and tenant dashboards with different layouts
 - [x] Properties management (CRUD operations)
@@ -845,7 +845,7 @@ http://localhost:3000/api
 - [x] Calendar/events system
 - [x] Role-based access control
 - [x] Input validation and error handling
-- [x] **Dynamic data fetching** from backend APIs
+- [x} **Dynamic data fetching** from backend APIs
 
 ### In Progress / Future Enhancements
 - Payment reminders and notifications
@@ -897,7 +897,7 @@ http://localhost:3000/api
 
 **File Changed**: `backend/routes/properties.js`
 
-### ✅ RESOLVED: Admin Dashboard Shows Zero Values
+### RESOLVED: Admin Dashboard Shows Zero Values
 **Problem**: Dashboard cards showed hardcoded 0 values instead of real data
 
 **Solution**: Connected components to backend APIs:
@@ -910,7 +910,7 @@ http://localhost:3000/api
 - `frontend/src/components/dashboard-admin/dashboard-admin-components/Summary section.jsx`
 - `frontend/src/components/dashboard-user/dashboard-user-components/Summary section.jsx`
 
-### ✅ RESOLVED: Missing API Functions
+### RESOLVED: Missing API Functions
 **Problem**: Frontend components couldn't fetch tenants, messages, or reports
 
 **Solution**: Added comprehensive API client in `frontend/src/Services/api.js`:
@@ -921,4 +921,3 @@ http://localhost:3000/api
 
 ---
 
-## 🧪 Testing
