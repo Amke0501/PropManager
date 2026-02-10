@@ -11,7 +11,7 @@ const BACKEND_URL = 'https://propmanager-1.onrender.com';
 const TEST_EMAIL = 'test@example.com';
 const TEST_PASSWORD = 'testpassword123';
 
-console.log('🚀 PropManager Deployment Tests\n');
+console.log(' PropManager Deployment Tests\n');
 console.log('=' .repeat(60));
 
 let testResults = {
@@ -21,7 +21,7 @@ let testResults = {
 
 async function testEndpoint(name, url, options = {}) {
   try {
-    console.log(`\n⏳ Testing: ${name}`);
+    console.log(`\n Testing: ${name}`);
     console.log(`   URL: ${url}`);
     
     const response = await fetch(url, {
@@ -34,20 +34,20 @@ async function testEndpoint(name, url, options = {}) {
     const data = await response.json().catch(() => ({}));
     
     if (response.ok) {
-      console.log(`✅ PASSED - Status: ${response.status}`);
+      console.log(` PASSED - Status: ${response.status}`);
       if (data.count !== undefined) {
         console.log(`   Count: ${data.count}`);
       }
       testResults.passed.push(name);
       return { success: true, data, status: response.status };
     } else {
-      console.log(`❌ FAILED - Status: ${response.status}`);
+      console.log(` FAILED - Status: ${response.status}`);
       console.log(`   Error: ${data.error || data.message || 'Unknown error'}`);
       testResults.failed.push(name);
       return { success: false, data, status: response.status };
     }
   } catch (error) {
-    console.log(`❌ FAILED - ${error.message}`);
+    console.log(` FAILED - ${error.message}`);
     testResults.failed.push(name);
     return { success: false, error: error.message };
   }
@@ -55,7 +55,7 @@ async function testEndpoint(name, url, options = {}) {
 
 async function runTests() {
   // Test 1: Basic connectivity
-  console.log('\n📡 CONNECTIVITY TESTS');
+  console.log('\n CONNECTIVITY TESTS');
   console.log('-'.repeat(60));
   
   await testEndpoint(
@@ -73,7 +73,7 @@ async function runTests() {
   );
 
   // Test 3: Properties endpoint
-  console.log('\n🏠 PROPERTIES ENDPOINT TESTS');
+  console.log('\n PROPERTIES ENDPOINT TESTS');
   console.log('-'.repeat(60));
   
   const propertiesTest = await testEndpoint(
@@ -82,12 +82,12 @@ async function runTests() {
   );
 
   if (propertiesTest.success && propertiesTest.data.count === 0) {
-    console.log('\n⚠️  WARNING: No properties found in database');
+    console.log('\n  WARNING: No properties found in database');
     console.log('   → You may need to create test properties in Supabase');
   }
 
   // Test 4: Frontend deployment
-  console.log('\n🖥️  FRONTEND TESTS');
+  console.log('\n  FRONTEND TESTS');
   console.log('-'.repeat(60));
   
   await testEndpoint(
@@ -97,24 +97,24 @@ async function runTests() {
 
   // Summary
   console.log('\n' + '='.repeat(60));
-  console.log('📊 TEST SUMMARY');
+  console.log(' TEST SUMMARY');
   console.log('='.repeat(60));
-  console.log(`✅ Passed: ${testResults.passed.length}`);
-  console.log(`❌ Failed: ${testResults.failed.length}`);
+  console.log(` Passed: ${testResults.passed.length}`);
+  console.log(` Failed: ${testResults.failed.length}`);
   
   if (testResults.passed.length > 0) {
-    console.log('\n✅ Passed Tests:');
+    console.log('\n Passed Tests:');
     testResults.passed.forEach(test => console.log(`   • ${test}`));
   }
 
   if (testResults.failed.length > 0) {
-    console.log('\n❌ Failed Tests:');
+    console.log('\n Failed Tests:');
     testResults.failed.forEach(test => console.log(`   • ${test}`));
   }
 
   // Recommendations
   console.log('\n' + '='.repeat(60));
-  console.log('💡 NEXT STEPS');
+  console.log(' NEXT STEPS');
   console.log('='.repeat(60));
 
   if (propertiesTest.success && propertiesTest.data.count === 0) {
@@ -130,8 +130,8 @@ async function runTests() {
   }
 
   if (testResults.failed.length === 0) {
-    console.log('✅ All deployment checks passed!');
-    console.log('🎉 Your application is ready for use');
+    console.log('All deployment checks passed!');
+    console.log(' Your application is ready for use');
   }
 
   console.log('\n' + '='.repeat(60) + '\n');
